@@ -1,7 +1,22 @@
+import React, {useEffect} from "react";
 import { SafeAreaView, View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Button from "../components/Button";
 
+import { auth } from "../firebaseConnection";
+import { onAuthStateChanged } from "firebase/auth";
+
 export default function Home({ navigation }) {
+
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, (user) =>{
+            if(user){
+                console.log(user.email)
+                navigation.replace("Home")
+                return;
+            }
+        })
+    }, [])
+
     return(
         <SafeAreaView style={Styles.View}>
             <View style={Styles.LogoContainer}>

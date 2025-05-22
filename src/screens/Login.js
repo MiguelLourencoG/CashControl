@@ -20,6 +20,7 @@ export default function Login({ navigation  }) {
                 email: user.user.email,
                 uid: user.user.uid
             })
+            navigation.replace("Home")
             
         })
         .catch(err => {
@@ -29,7 +30,6 @@ export default function Login({ navigation  }) {
 
     return(
         <SafeAreaView style={Styles.View}>
-            <Text>Usuário logado: {authUser && authUser.uid}</Text>
             <View style={Styles.TitleContainer}>
                 <Text style={Styles.Title}>Login</Text>
             </View>            

@@ -2,17 +2,12 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 
 import { db } from "../firebaseConnection";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, collection } from "firebase/firestore";
 
 import Button from "../components/Button";
 import ContaCard from "../components/ContaCard";
 import CartaoCard from "../components/CartaoCard";
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
-
-
-const saldo = 50.50//tem q ver como tratar esse numero de uma forma que pareça real
-//De R$50.5 para R$50,50
 
 export default function Home({ navigation }) {
 
@@ -22,16 +17,17 @@ export default function Home({ navigation }) {
     ];
 
     const [nome, setNome] = useState('Carregando...');
+    const [saldoTotal, setSaldoTotal] = useState(0);    
 
     useEffect(() => {
-
+        
         async function getDados() {
 
             const docref = doc(db, "users", "0")
 
             getDoc(docref)
             .then((snapshot) => {
-                setNome(snapshot.data().nome)
+                setNome(snapshot.data()?.nome)
             }).catch((err) => {
                 console.log("error: ")
                 console.log(err)
@@ -41,12 +37,15 @@ export default function Home({ navigation }) {
         getDados();
     }, [])
 
+
+
+
     return(
         <SafeAreaView style={styles.View}>
             <ScrollView showsVerticalScrollIndicator={false} >
                 <View style={styles.HeaderContainer}>
                     <Text style={styles.Title}>Bem vindo {nome}!</Text>
-                    <Text style={styles.Text}>Saldo atual: R${saldo}</Text>
+                    <Text style={styles.Text}>Saldo atual: R${saldoTotal.toFixed(2)}</Text>
                 </View>
 
                 <View style={styles.AppContainer}>
@@ -70,8 +69,6 @@ export default function Home({ navigation }) {
                                 <Icon name="add" size={40} color="#fff" />
                             </TouchableOpacity>
                             
-
-                            {/* Card adicionar */}
                             
                         </ScrollView>
                     </View>
@@ -90,31 +87,18 @@ export default function Home({ navigation }) {
                             
                             <TouchableOpacity
                                 style={styles.AddCard}
-                                onPress={() => navigation.navigate('NovaConta')}
+                                onPress={() => navigation.navigate('NovoCartao')}
                                 activeOpacity={0.7}
                                 >
                                 <Icon name="add" size={40} color="#fff" />
                             </TouchableOpacity>
                             
 
-                            {/* Card adicionar */}
                             
                         </ScrollView>
                     </View> 
-                    {/*<View>
-                        <Text>Contas:</Text>
-                        <ContaCard nome={'Nubank'} saldo={'200,00'}/>
-                        <ContaCard nome={'Caixa'} saldo={'400,00'}/>
-
-                        <Button text="Adicionar conta" onPress={() => navigation.navigate("NovaConta")}/>
-                    </View>
-                    <View>
-                        <Text>Cartões:</Text>
-                        <CartaoCard nome={'Nubank digital'} limite={'2000,00'}/>
-                        <CartaoCard nome={'Nubank físico'} limite={'1500,00'}/>
-                        
-                        <Button text="Adicionar cartão" onPress={() => navigation.navigate("NovoCartao")}/>  
-                    </View>*/}          
+                            
+                    <Button text={'Perfil'} onPress={() => navigation.navigate("Profile")}/>      
                 </View>
             </ScrollView>           
         </SafeAreaView>
