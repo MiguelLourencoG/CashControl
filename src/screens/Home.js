@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { SafeAreaView, Text, StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
+
+import { AuthContext } from "../contexts/auth";
 
 import { db } from "../firebaseConnection";
 import { doc, getDoc, setDoc, collection } from "firebase/firestore";
@@ -11,9 +13,17 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function Home({ navigation }) {
 
+    const {user} = useContext(AuthContext)
+
     const contas = [
         { id: '1', nome: 'Nubank', saldo: 2500 },
         { id: '2', nome: 'Carteira', saldo: 150 },
+    ];
+
+    const transacoes = [
+        { id: '1', nome: 'Pix recebido', valor: 200 },
+        { id: '2', nome: 'Mercado', valor: -75.9 },
+        { id: '3', nome: 'Transporte', valor: -20 },
     ];
 
     const [nome, setNome] = useState('Carregando...');
@@ -22,23 +32,14 @@ export default function Home({ navigation }) {
     useEffect(() => {
         
         async function getDados() {
-
-            const docref = doc(db, "users", "0")
-
-            getDoc(docref)
-            .then((snapshot) => {
-                setNome(snapshot.data()?.nome)
-            }).catch((err) => {
-                console.log("error: ")
-                console.log(err)
-            })
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            if(userSnap){
+                setNome(userSnap.data()?.nome)
+            }
         }
 
         getDados();
     }, [])
-
-
-
 
     return(
         <SafeAreaView style={styles.View}>
@@ -97,8 +98,28 @@ export default function Home({ navigation }) {
                             
                         </ScrollView>
                     </View> 
-                            
-                    <Button text={'Perfil'} onPress={() => navigation.navigate("Profile")}/>      
+
+
+                    <View style={{ marginTop: 20}}>
+                        <Text style={styles.ContainerTitle}>Últimas transações</Text>
+
+                        {transacoes.map((item) => (
+                            <View key={item.id} style={styles.Item}>
+                            <Text style={{fontSize: 20}}>{item.nome}</Text>
+                            <Text style={{fontSize: 20, color: item.valor < 0 ? 'red' : 'green' }}>
+                                R$ {item.valor.toFixed(2)}
+                            </Text>
+                            </View>
+                        ))}
+
+                        <TouchableOpacity>
+                            <Text style={{ color: '#00695C', marginTop: 8 }}>Ver todas</Text>
+                        </TouchableOpacity>
+                        </View>
+
+
+                    <Button text={'Perfil'} onPress={() => navigation.navigate("Profile")}/> 
+                        
                 </View>
             </ScrollView>           
         </SafeAreaView>
@@ -155,6 +176,20 @@ const styles = StyleSheet.create({
     },
 
     ContainerTitle:{
-        fontSize: 25
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 8
+    },
+
+    Item:{
+        
+        backgroundColor: '#fff',
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        elevation: 2
     }
 })

@@ -1,5 +1,8 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { SafeAreaView, Text, StyleSheet, TextInput, View, TouchableOpacity } from "react-native";
+
+import { AuthContext } from "../contexts/auth";
+
 import { auth } from "../firebaseConnection";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -7,25 +10,15 @@ import Button from "../components/Button";
 
 export default function Login({ navigation  }) {
 
+    const {login} = useContext(AuthContext)
+
     const [email, setEmail] = useState("")
     const [senha, setSenha] = useState("")
 
     const [authUser, setAuthUser] = useState(null)
 
     async function handleLogin(){
-        const user = await signInWithEmailAndPassword(auth, email, senha)
-        .then((user) => {
-            console.log(user)
-            setAuthUser({
-                email: user.user.email,
-                uid: user.user.uid
-            })
-            navigation.replace("Home")
-            
-        })
-        .catch(err => {
-            console.log(err);
-        })
+        login(email, senha)
     }
 
     return(
@@ -61,7 +54,7 @@ export default function Login({ navigation  }) {
                         Não possui uma conta?
                             <Text 
                                 style={Styles.TextLink} 
-                                onPress={() => navigation.navigate("Login")}> Clique aqui!
+                                onPress={() => navigation.navigate("SignUp")}> Clique aqui!
                             </Text>
                     </Text>
                 </View>

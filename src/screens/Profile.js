@@ -1,20 +1,20 @@
-import React from "react";
+import React, {useContext} from "react";
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet } from "react-native"
 
 import { useNavigation, StackActions } from "@react-navigation/native";
 
-import { auth } from "../firebaseConnection";
-import { signOut } from "firebase/auth";
-
 import Button from "../components/Button";
 
-
+import { AuthContext } from "../contexts/auth";
 
 export default function Profile({}){
+
+    const {logout} = useContext(AuthContext)
+
     const navigation = useNavigation();
+
     async function handleLogout() {
-        await signOut(auth)
-        navigation.dispatch(StackActions.popTo("Login"))
+        logout();
     }
 
     return(

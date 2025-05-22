@@ -1,16 +1,22 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { SafeAreaView, View, Text, StyleSheet, TextInput } from "react-native";
+
 import Button from "../components/Button";
-import { auth } from "../firebaseConnection";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+
+
+
+import { AuthContext } from "../contexts/auth";
 
 export default function SignUp({ navigation }) {
+
+    const {signUp} = useContext(AuthContext)
+
+    const [nome, setNome] = useState("")
     const [email, setEmail] = useState("")
     const [senha, setSenha] = useState("")
 
-    async function handleCreateUser() {
-        const user = createUserWithEmailAndPassword(auth, email, senha)
-        console.log(user);
+    function handleSignUp(){
+        signUp(nome, email, senha);
     }
 
     return(
@@ -24,6 +30,8 @@ export default function SignUp({ navigation }) {
                     placeholder="Digite seu nome..."
                     autoCapitalize="words"
                     autoCorrect={false}
+                    value={nome}
+                    onChangeText={(text) => setNome(text)}
                     style={Styles.TextInput}
                 />
                 <Text style={Styles.Text}>Email:</Text>
@@ -47,7 +55,7 @@ export default function SignUp({ navigation }) {
                     style={Styles.TextInput}
                 />
 
-                <Button text="Cadastrar" onPress={handleCreateUser}/>
+                <Button text="Cadastrar" onPress={handleSignUp}/>
 
                 <View style={{ alignItems: 'center'}}>
                     <Text style={{fontSize: 22}}>
