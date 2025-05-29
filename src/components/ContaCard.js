@@ -1,12 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function ContaCard({ nome, saldo }) {
   return (
-    <View style={styles.Card}>
-      <Text style={styles.Name}>{nome}</Text>
-      <Text style={styles.Saldo}>R$ {saldo}</Text>
-    </View>
+    <TouchableOpacity style={styles.Card}>
+      <Text
+        style={styles.Nome}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {nome}
+      </Text>
+      <Text 
+        style={styles.Saldo}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        R$ {saldo.toFixed(2)}
+      </Text>
+    </TouchableOpacity>
   );
 }
 
@@ -22,14 +34,14 @@ const styles = StyleSheet.create({
     elevation: 2,
     
   },
-  Name: {
+  Nome: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
   Saldo: {
     fontSize: 16,
-    color: '#666',
+    color: '#373',
     marginTop: 4,
   },
 });

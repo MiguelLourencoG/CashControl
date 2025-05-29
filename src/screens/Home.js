@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { SafeAreaView, Text, StyleSheet, View, ScrollView, TouchableOpacity } from "react-native";
 
+import { Feather } from '@expo/vector-icons';
 import { AuthContext } from "../contexts/auth";
 
 import { db } from "../firebaseConnection";
@@ -20,10 +21,16 @@ export default function Home({ navigation }) {
         { id: '2', nome: 'Carteira', saldo: 150 },
     ];
 
+    const cartoes = [
+        { id: '1', nome: 'Nubank digital', limite: 2000, fatura: 500 },
+        { id: '2', nome: 'Caixa físico', limite: 1500, fatura: 0 }
+    ];
+
+
     const transacoes = [
-        { id: '1', nome: 'Pix recebido', valor: 200 },
-        { id: '2', nome: 'Mercado', valor: -75.9 },
-        { id: '3', nome: 'Transporte', valor: -20 },
+        { id: '1', nome: 'Pix recebido', valor: 200, data: '20/03/2025'},
+        { id: '2', nome: 'Mercado', valor: -75.9, data: '21/04/2025' },
+        { id: '3', nome: 'Transporte', valor: -20, data: '22/05/2025' },
     ];
 
     const [nome, setNome] = useState('Carregando...');
@@ -43,15 +50,103 @@ export default function Home({ navigation }) {
 
     return(
         <SafeAreaView style={styles.View}>
-            <ScrollView showsVerticalScrollIndicator={false} >
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }} >
+                
                 <View style={styles.HeaderContainer}>
-                    <Text style={styles.Title}>Bem vindo {nome}!</Text>
-                    <Text style={styles.Text}>Saldo atual: R${saldoTotal.toFixed(2)}</Text>
+
+                    <View style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingVertical: 10, 
+                    }}>   
+
+                        <Text style={{
+                            color: '#FFF',
+                            fontSize: 20,
+                            fontWeight: 'bold'
+                        }}>
+                            Olá {nome}!
+                        </Text>
+
+                        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                            <Icon name="person" size={36} color="#FFF"/>
+                        </TouchableOpacity>
+
+                    </View>
+
+                    <View style={{flexDirection: 'row', marginVertical: 20}}>
+
+                        <View style={{flex: 1, justifyContent: 'flex-end'}}>
+                            <Text style={{marginHorizontal: 'auto',
+                                fontSize: 15,
+                                color: '#CFC',
+                                fontWeight: 'bold'
+                            }}>
+                                Limite atual
+                            </Text>
+
+                            <Text style={{marginHorizontal: 'auto',
+                                fontSize: 17,
+                                color: '#7F7',
+                                fontWeight: 'bold'
+                            }}>
+                                R${saldoTotal.toFixed(2)}
+                            </Text>
+                        </View>
+
+                        <View style={{flex: 2}}>
+                            <Text style={{marginHorizontal: 'auto',
+                                fontSize: 20,
+                                color: '#FFF',
+                                fontWeight: 'bold'
+                            }}>
+                                Saldo atual
+                            </Text>
+
+                            <Text style={{marginHorizontal: 'auto',
+                                fontSize: 30,
+                                color: '#FFF',
+                                fontWeight: 'bold'
+                            }}>
+                                R${saldoTotal.toFixed(2)}
+                            </Text>
+                        </View>
+
+                        <View style={{flex: 1, justifyContent: 'flex-end'}}>
+                            <Text style={{marginHorizontal: 'auto',
+                                fontSize: 15,
+                                color: '#F99',
+                                fontWeight: 'bold'
+                            }}>
+                                Fatura atual
+                            </Text>
+
+                            <Text style={{marginHorizontal: 'auto',
+                                fontSize: 17,
+                                color: '#F33',
+                                fontWeight: 'bold'
+                            }}>
+                                R${saldoTotal.toFixed(2)}
+                            </Text>
+                        </View>
+
+                    </View>
+
+                    
+
                 </View>
 
                 <View style={styles.AppContainer}>
-                    <View>
-                        <Text style={styles.ContainerTitle}>Contas</Text>
+
+                    <View style={{marginBottom: 10}}>
+
+                        <TouchableOpacity style={styles.CardsTitle} onPress={() => navigation.navigate('Contas')}>
+                            <Text style={styles.ContainerTitle}>Contas</Text>
+                            <Feather name="chevron-right" size={24} color="black" />
+                        </TouchableOpacity>
+
                         <ScrollView 
                             horizontal 
                             showsHorizontalScrollIndicator={false} 
@@ -69,20 +164,26 @@ export default function Home({ navigation }) {
                                 >
                                 <Icon name="add" size={40} color="#fff" />
                             </TouchableOpacity>
-                            
-                            
+                                
+                                
                         </ScrollView>
+                        
                     </View>
 
-                    <View>
-                        <Text style={styles.ContainerTitle}>Cartões</Text>
+                    <View style={{marginBottom: 30}}>
+
+                        <TouchableOpacity style={styles.CardsTitle} onPress={() => navigation.navigate('Cartoes')}>
+                            <Text style={styles.ContainerTitle}>Cartões</Text>
+                            <Feather name="chevron-right" size={24} color="black" />
+                        </TouchableOpacity>
+
                         <ScrollView 
                             horizontal 
                             showsHorizontalScrollIndicator={false} 
                             contentContainerStyle={styles.ScrollContent}
                         >
-                            {contas.map((conta) => (
-                                <CartaoCard key={conta.id} nome={conta.nome} limite={conta.saldo} />
+                            {cartoes.map((cartao) => (
+                                <CartaoCard key={cartao.id} nome={cartao.nome} limite={cartao.limite} fatura={cartao.fatura}/>
                             ))}
 
                             
@@ -97,30 +198,42 @@ export default function Home({ navigation }) {
 
                             
                         </ScrollView>
-                    </View> 
 
+                    </View>
 
-                    <View style={{ marginTop: 20}}>
-                        <Text style={styles.ContainerTitle}>Últimas transações</Text>
+                    <View style={{marginBottom: 10}}>
 
+                        <TouchableOpacity style={styles.CardsTitle} onPress={() => navigation.navigate('Transacoes')}>
+                            <Text style={styles.ContainerTitle}>Últimas transações</Text>
+                            <Feather name="chevron-right" size={24} color="black" />
+                        </TouchableOpacity>
+                        
                         {transacoes.map((item) => (
-                            <View key={item.id} style={styles.Item}>
-                            <Text style={{fontSize: 20}}>{item.nome}</Text>
-                            <Text style={{fontSize: 20, color: item.valor < 0 ? 'red' : 'green' }}>
-                                R$ {item.valor.toFixed(2)}
-                            </Text>
-                            </View>
-                        ))}
+                            <TouchableOpacity key={item.id} style={styles.Item} >
+                                <View>
+                                    <Text style={{fontSize: 20,}}>{item.nome}</Text>
+                                    <Text>{item.data}</Text>
+                                </View>
+                    
+                                <View>
+                                    <Text style={{fontSize: 20, color: item.valor < 0 ? 'red' : 'green' }}>
+                                        R$ {item.valor.toFixed(2)}
+                                    </Text>                       
+                                    
+                                </View>
+                            </TouchableOpacity>                      
+                        ))}                        
 
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.navigate('Transacoes')}>
                             <Text style={{ color: '#00695C', marginTop: 8 }}>Ver todas</Text>
                         </TouchableOpacity>
-                        </View>
 
+                    </View>
+                    
+                    <Text style={styles.ContainerTitle}>Gráficos</Text>
 
-                    <Button text={'Perfil'} onPress={() => navigation.navigate("Profile")}/> 
-                        
                 </View>
+
             </ScrollView>           
         </SafeAreaView>
     )
@@ -155,14 +268,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#F5F5F5',
         padding: 20,
         borderTopLeftRadius: 10,
-        borderTopRightRadius: 10
+        borderTopRightRadius: 10,
+        minHeight: '100%',
+        flexGrow: 1
     },
 
-    ScrollContent: {
-        
-        flexDirection: 'row',
+    CardsTitle:{
+        flex: 1, 
+        flexDirection: 'row', 
+        justifyContent: 'space-between'
+    },
 
-
+    ScrollContent: {        
+        flexDirection: 'row'
     },
 
     AddCard: {
@@ -182,7 +300,6 @@ const styles = StyleSheet.create({
     },
 
     Item:{
-        
         backgroundColor: '#fff',
         padding: 12,
         borderRadius: 8,
@@ -191,5 +308,5 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         elevation: 2
-    }
+    },
 })

@@ -1,13 +1,41 @@
 // components/CartaoCard.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from "@react-navigation/native";
 
-export default function CartaoCard({ nome, limite }) {
+export default function CartaoCard({ nome, limite, fatura }) {
+  const navigation = useNavigation();
   return (
-    <View style={styles.Card}>
-      <Text style={styles.Name}>{nome}</Text>
-      <Text style={styles.Limit}>R$ {limite}</Text>
-    </View>
+    <TouchableOpacity 
+      style={styles.Card} 
+      onPress={() => navigation.navigate('VerCartao')
+    }>
+    
+      <Text
+        style={styles.Nome}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {nome}
+      </Text>
+
+      <Text 
+        style={styles.Limite}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        R$ {limite.toFixed(2)}
+      </Text>
+
+      <Text
+        style={styles.Fatura}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        R$ {fatura.toFixed(2)}
+      </Text>
+    
+    </TouchableOpacity>
   );
 }
 
@@ -23,14 +51,20 @@ export const styles = StyleSheet.create({
     elevation: 2,
     
   },
-  Name: {
+  Nome: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
-  Limit: {
+  Limite: {
     fontSize: 16,
-    color: '#666',
+    color: '#373',
     marginTop: 4,
   },
+
+  Fatura:{
+    fontSize: 16,
+    color: '#733',
+    marginTop: 4,
+  }
 });
