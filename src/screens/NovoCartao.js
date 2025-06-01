@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import Button from "../components/Button";
 
-export default function NovaConta({ navigation }) {
+export default function NovoCartao({ navigation }) {
     return (
         <SafeAreaView style={Styles.View}>
             <View style={Styles.TitleContainer}>

@@ -10,6 +10,7 @@ import { doc, getDoc, setDoc, collection } from "firebase/firestore";
 import Button from "../components/Button";
 import ContaCard from "../components/ContaCard";
 import CartaoCard from "../components/CartaoCard";
+import AddCard from "../components/AddCard";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function Home({ navigation }) {
@@ -17,7 +18,7 @@ export default function Home({ navigation }) {
     const {user} = useContext(AuthContext)
 
     const contas = [
-        { id: '1', nome: 'Nubank', saldo: 2500 },
+        { id: '1', nome: 'Nubank', saldo: 3000 },
         { id: '2', nome: 'Carteira', saldo: 150 },
     ];
 
@@ -26,11 +27,16 @@ export default function Home({ navigation }) {
         { id: '2', nome: 'Caixa físico', limite: 1500, fatura: 0 }
     ];
 
-
     const transacoes = [
         { id: '1', nome: 'Pix recebido', valor: 200, data: '20/03/2025'},
         { id: '2', nome: 'Mercado', valor: -75.9, data: '21/04/2025' },
         { id: '3', nome: 'Transporte', valor: -20, data: '22/05/2025' },
+    ];
+
+    const pendencias = [
+        { id: '1', nome: 'Mecânico', valor: 200, data: '20/03/2025'},
+        { id: '2', nome: 'Conta de luz', valor: 300, data: '21/04/2025' },
+        { id: '3', nome: 'Mensalidade curso', valor: 50, data: '22/05/2025' },
     ];
 
     const [nome, setNome] = useState('Carregando...');
@@ -201,7 +207,7 @@ export default function Home({ navigation }) {
 
                     </View>
 
-                    <View style={{marginBottom: 10}}>
+                    <View style={{marginBottom: 20}}>
 
                         <TouchableOpacity style={styles.CardsTitle} onPress={() => navigation.navigate('Transacoes')}>
                             <Text style={styles.ContainerTitle}>Últimas transações</Text>
@@ -209,7 +215,11 @@ export default function Home({ navigation }) {
                         </TouchableOpacity>
                         
                         {transacoes.map((item) => (
-                            <TouchableOpacity key={item.id} style={styles.Item} >
+                            <TouchableOpacity 
+                                key={item.id} 
+                                style={styles.Item}
+                                onPress={() => navigation.navigate('EditarTransacao')}
+                            >
                                 <View>
                                     <Text style={{fontSize: 20,}}>{item.nome}</Text>
                                     <Text>{item.data}</Text>
@@ -222,11 +232,40 @@ export default function Home({ navigation }) {
                                     
                                 </View>
                             </TouchableOpacity>                      
-                        ))}                        
+                        ))}
 
-                        <TouchableOpacity onPress={() => navigation.navigate('Transacoes')}>
-                            <Text style={{ color: '#00695C', marginTop: 8 }}>Ver todas</Text>
+                        <AddCard onPress={() => navigation.navigate('NovaTransacao')}/>
+
+                    </View>
+
+                    <View style={{marginBottom: 20}}>
+
+                        <TouchableOpacity style={styles.CardsTitle} onPress={() => navigation.navigate('Pendencias')}>
+                            <Text style={styles.ContainerTitle}>Últimas pendência</Text>
+                            <Feather name="chevron-right" size={24} color="black" />
                         </TouchableOpacity>
+                        
+                        {pendencias.map((item) => (
+                            <TouchableOpacity 
+                                key={item.id} 
+                                style={styles.Item}
+                                onPress={() => navigation.navigate('EditarPendencia')}
+                            >
+                                <View>
+                                    <Text style={{fontSize: 20,}}>{item.nome}</Text>
+                                    <Text>{item.data}</Text>
+                                </View>
+                    
+                                <View>
+                                    <Text style={{fontSize: 20, color: 'red'}}>
+                                        R$ {item.valor.toFixed(2)}
+                                    </Text>                       
+                                    
+                                </View>
+                            </TouchableOpacity>                      
+                        ))}
+
+                        <AddCard onPress={() => navigation.navigate('NovaPendencia')}/>
 
                     </View>
                     
@@ -265,7 +304,7 @@ const styles = StyleSheet.create({
     },
     
     AppContainer:{
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#eee',
         padding: 20,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,

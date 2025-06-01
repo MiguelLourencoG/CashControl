@@ -2,12 +2,7 @@ import React, {useEffect} from "react";
 import { SafeAreaView, View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Button from "../components/Button";
 
-import { auth } from "../firebaseConnection";
-import { onAuthStateChanged } from "firebase/auth";
-
-export default function Start({ navigation }) {
-
-    
+export default function Start({ navigation }) {    
 
     return(
         <SafeAreaView style={Styles.View}>

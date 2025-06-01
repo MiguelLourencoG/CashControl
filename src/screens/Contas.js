@@ -3,7 +3,7 @@ import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-nati
 
 import { Feather } from '@expo/vector-icons';
 
-export default function Contas(){
+export default function Contas({navigation}){
 
     const contas = [
         { id: '1', nome: 'Nubank', saldo: 2500 },
@@ -20,7 +20,7 @@ export default function Contas(){
             <View style={styles.Container}>
                 
                 {contas.map((item) => (
-                    <TouchableOpacity key={item.id} style={styles.Item}>
+                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarConta')}>
                 
                         <View style={{ flex: 1 }}>
                             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.nome}</Text>

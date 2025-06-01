@@ -3,18 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from '@expo/vector-icons';
 
-export default function TransacaoCard({ id, nome, valor, data }) {
+export default function PendenciaCard({ id, nome, valor, data }) {
     const navigation = useNavigation();
     return (
         <View>
             <TouchableOpacity 
                 style={styles.Item} 
-                onPress={() => navigation.navigate('EditarTransacao')}
+                onPress={() => navigation.navigate('EditarPendencia')}
             >
                 
-                <View
-                    style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}
-                >
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+
                     <View>
                         <Text 
                             style={styles.Title}
@@ -26,22 +25,23 @@ export default function TransacaoCard({ id, nome, valor, data }) {
                         <Text
                             style={{fontSize: 17}}
                             numberOfLines={1}
-                            ellipsizeMode="tail"
-                        >
-                            {data}
-                        </Text>
+                            ellipsizeMode="tail" 
+                        >{data}</Text>
                     </View>
 
                     <View>
                         <Text 
-                            style={{fontSize: 20, color: valor < 0 ? 'red' : 'green' }}
+                            style={{fontSize: 20, color: 'red'}}
                             numberOfLines={1}
                             ellipsizeMode="tail"                        
                         >
                             R$ {valor.toFixed(2)}
                         </Text>                
                     </View>
+
                 </View>
+
+                
                 
                 <TouchableOpacity style={styles.Delete}>
                     <Feather name="trash-2" size={30} color="#fff" />

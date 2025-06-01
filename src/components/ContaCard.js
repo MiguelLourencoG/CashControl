@@ -1,9 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from "@react-navigation/native";
 
 export default function ContaCard({ nome, saldo }) {
+  const navigation = useNavigation();
   return (
-    <TouchableOpacity style={styles.Card}>
+    <TouchableOpacity 
+      style={styles.Card}
+      onPress={() => navigation.navigate('EditarConta')}
+    >
       <Text
         style={styles.Nome}
         numberOfLines={1}
@@ -11,6 +16,7 @@ export default function ContaCard({ nome, saldo }) {
       >
         {nome}
       </Text>
+
       <Text 
         style={styles.Saldo}
         numberOfLines={1}
@@ -18,6 +24,7 @@ export default function ContaCard({ nome, saldo }) {
       >
         R$ {saldo.toFixed(2)}
       </Text>
+
     </TouchableOpacity>
   );
 }

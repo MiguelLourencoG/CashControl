@@ -1,34 +1,38 @@
 import React from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import TransacaoCard from '../components/TransacaoCard'
-import Button from "../components/Button";
 import AddButtom from "../components/AddButton";
+import PendenciaCard from '../components/PendenciaCard';
 
-export default function Transacoes({navigation}){
+export default function Pendencias({navigation}){
 
-    const transacoes = [
-        { id: '1', nome: 'Pix recebido', valor: 200, data: '20/03/2025'},
-        { id: '2', nome: 'Mercado', valor: -75.9, data: '21/04/2025' },
-        { id: '3', nome: 'Transporte', valor: -20, data: '22/05/2025' },
+    const pendencias = [
+        { id: '1', nome: 'Mecânico', valor: 200, data: '20/03/2025'},
+        { id: '2', nome: 'Conta de luz', valor: 300, data: '21/04/2025' },
+        { id: '3', nome: 'Mensalidade curso', valor: 50, data: '22/05/2025' },
     ];
 
     return(
         <SafeAreaView style={styles.View}>
             <View style={styles.TitleContainer}>
-                <Text style={styles.Text}>Visualize todas as suas transações!</Text>
+                <Text style={styles.Text}>Visualize todas as suas pendência!</Text>
             </View>
 
             <View style={styles.Container}>
                 
-                {transacoes.map((item) => (
-                    <TransacaoCard key={item.id} nome={item.nome} valor={item.valor} data={item.data}/>                      
-                ))}
+                {pendencias.map((item) => (
+
+                    <PendenciaCard 
+                        key={item.id} nome={item.nome}
+                        valor={item.valor}
+                        data={item.data}
+                    />
+                                         
+                ))}                
 
             </View>
 
-            <AddButtom onPress={() => navigation.navigate('NovaTransacao')}/>
+            <AddButtom onPress={() => navigation.navigate('NovaPendencia')}/>
 
         </SafeAreaView>
     )
@@ -76,5 +80,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         elevation: 2
-    }
+    },
+
+    Delete:{
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 10,
+        backgroundColor: 'red',
+        borderRadius: 8,
+        padding: 8
+    },
+
+    
+
 })

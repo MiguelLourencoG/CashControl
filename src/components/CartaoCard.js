@@ -1,4 +1,3 @@
-// components/CartaoCard.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
@@ -8,7 +7,7 @@ export default function CartaoCard({ nome, limite, fatura }) {
   return (
     <TouchableOpacity 
       style={styles.Card} 
-      onPress={() => navigation.navigate('VerCartao')
+      onPress={() => navigation.navigate('EditarCartao')
     }>
     
       <Text

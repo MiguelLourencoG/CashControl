@@ -3,7 +3,7 @@ import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-nati
 
 import { Feather } from '@expo/vector-icons';
 
-export default function Cartoes(){
+export default function Cartoes({navigation}){
 
     const cartoes = [
         { id: '1', nome: 'Nubank digital', limite: 2000, fatura: 500 },
@@ -20,7 +20,7 @@ export default function Cartoes(){
             <View style={styles.Container}>
                 
                 {cartoes.map((item) => (
-                    <TouchableOpacity key={item.id} style={styles.Item}>
+                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarCartao')}>
                 
                         <View style={{ flex: 1 }}>
                             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.nome}</Text>
