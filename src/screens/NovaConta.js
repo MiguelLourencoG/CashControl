@@ -1,8 +1,39 @@
-import React from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
+import React, { useContext, useState } from "react";
+import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
 import Button from "../components/Button";
 
+import { AuthContext } from "../contexts/auth";
+
+import { db } from "../firebaseConnection";
+import { collection, addDoc } from "firebase/firestore";
+
 export default function NovaConta({ navigation }) {
+
+    const {user} = useContext(AuthContext);
+
+    const [nome, setNome] = useState()
+    const [saldo, setSaldo] = useState()
+    const userUid = user.uid
+
+    async function addConta() {
+
+        console.log(nome)
+        console.log(saldo)
+        console.log(userUid)
+
+        try {
+            const docRef = await addDoc(collection(db, "contas"), {
+                nome,
+                saldo: parseFloat(saldo),
+                userUid: user.uid
+            });
+            console.log("Conta adicionada: ", docRef);
+            navigation.goBack();
+        } catch (e) {
+            console.error("Erro ao adicionar conta: ", e);
+        }
+    }
+
     return (
         <SafeAreaView style={Styles.View}>
             <View style={Styles.TitleContainer}>
@@ -11,20 +42,25 @@ export default function NovaConta({ navigation }) {
             <View style={Styles.Container}>
                 <Text style={Styles.Text}>Nome da conta:</Text>
                 <TextInput
+                    style={Styles.TextInput} 
                     placeholder="Digite o nome da conta..."
                     autoCapitalize="sentences"
                     autoCorrect={false}
-                    style={Styles.TextInput} 
+                    value={nome}
+                    onChangeText={setNome}
+                    
                 />
 
                 <Text style={Styles.Text}>Saldo da conta:</Text>
                 <TextInput 
                     style={Styles.TextInput} 
                     placeholder="Digite o saldo da conta..."
-                    keyboardType="numeric" 
+                    keyboardType="numeric"
+                    value={saldo}
+                    onChangeText={setSaldo}
                 />
 
-                <Button text="Salvar" onPress={() => navigation.goBack()}/>
+                <Button text="Salvar" onPress={() => addConta(nome, saldo, user.uid)}/>
             </View>
         </SafeAreaView>
     );

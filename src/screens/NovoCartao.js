@@ -1,8 +1,42 @@
-import React from "react";
+import React, { useState, useContext} from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import Button from "../components/Button";
 
+import { AuthContext } from "../contexts/auth";
+
+import { db } from "../firebaseConnection";
+import { collection, addDoc } from "firebase/firestore";
+
 export default function NovoCartao({ navigation }) {
+
+    const {user} = useContext(AuthContext);
+
+    const [nome, setNome] = useState()
+    const [limite, setLimite] = useState()
+    const [fatura, setFatura] = useState()
+    const userUid = user.uid
+
+    async function addCartao() {
+
+        console.log(nome)
+        console.log(limite)
+        console.log(fatura)
+        console.log(userUid)
+
+        try {
+            const docRef = await addDoc(collection(db, "cartoes"), {
+                nome,
+                limite: parseFloat(limite),
+                fatura: parseFloat(fatura),
+                userUid: user.uid
+            });
+            console.log("Cartão adicionado: ", docRef);
+            navigation.goBack();
+        } catch (e) {
+            console.error("Erro ao adicionar cartão: ", e);
+        }
+    }
+
     return (
         <SafeAreaView style={Styles.View}>
             <View style={Styles.TitleContainer}>
@@ -11,20 +45,33 @@ export default function NovoCartao({ navigation }) {
             <View style={Styles.Container}>
                 <Text style={Styles.Text}>Nome do cartão:</Text>
                 <TextInput
+                    style={Styles.TextInput} 
                     placeholder="Digite o nome do cartão..."
                     autoCapitalize="sentences"
                     autoCorrect={false}
-                    style={Styles.TextInput} 
+                    value={nome}
+                    onChangeText={setNome}                    
                 />
 
                 <Text style={Styles.Text}>Limite do cartão:</Text>
                 <TextInput 
                     style={Styles.TextInput} 
                     placeholder="Digite o limite do cartão..."
-                    keyboardType="numeric" 
+                    keyboardType="numeric"                    
+                    value={limite}
+                    onChangeText={setLimite}
                 />
 
-                <Button text="Salvar" onPress={() => navigation.goBack()}/>
+                <Text style={Styles.Text}>Fatura atual do cartão:</Text>
+                <TextInput 
+                    style={Styles.TextInput} 
+                    placeholder="Digite o fatura do cartão..."
+                    keyboardType="numeric"
+                    value={fatura}
+                    onChangeText={setFatura}
+                />
+
+                <Button text="Salvar" onPress={() => addCartao(nome, limite, fatura, user.uid)}/>
             </View>
         </SafeAreaView>
     );

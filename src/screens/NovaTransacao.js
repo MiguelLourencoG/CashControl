@@ -1,9 +1,16 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Button from "../components/Button";
 
+import { AuthContext } from "../contexts/auth";
+
+import { db } from "../firebaseConnection";
+import { collection, addDoc } from "firebase/firestore";
+
 export default function NovaTransacao({ navigation }) {
+
+    const {user} = useContext(AuthContext);
 
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
@@ -19,6 +26,32 @@ export default function NovaTransacao({ navigation }) {
         setShow(true);
     };
 
+        const [nome, setNome] = useState()
+        const [valor, setValor] = useState()
+        const [data, setData] = useState(date.toLocaleDateString())
+        const userUid = user.uid
+    
+        async function addTransacao() {
+    
+            console.log(nome)
+            console.log(valor)
+            console.log(data)
+            console.log(userUid)
+    
+            try {
+                const docRef = await addDoc(collection(db, "transacoes"), {
+                    nome,
+                    valor: parseFloat(valor),
+                    data,
+                    userUid: user.uid
+                });
+                console.log("Transação adicionado: ", docRef);
+                navigation.goBack();
+            } catch (e) {
+                console.error("Erro ao adicionar transação: ", e);
+            }
+        }
+
     return (
         <SafeAreaView style={styles.View}>
             <View style={styles.TitleContainer}>
@@ -27,23 +60,31 @@ export default function NovaTransacao({ navigation }) {
             <View style={styles.Container}>
                 <Text style={styles.Label}>Nome da transação:</Text>
                 <TextInput
+                    style={styles.TextInput}
                     placeholder="ex. Mercado"
                     autoCapitalize="sentences"
                     autoCorrect={false}
-                    style={styles.TextInput} 
+                    value={nome}
+                    onChangeText={setNome}
                 />
 
                 <Text style={styles.Label}>Valor da transação:</Text>
                 <TextInput 
                     style={styles.TextInput} 
                     placeholder="ex. -100.00"
-                    keyboardType="numeric" 
+                    keyboardType="numeric"
+                    value={valor}
+                    onChangeText={setValor}
                 />
 
                 <Text style={styles.Label}>Data da transação:</Text>
                 <TouchableOpacity onPress={showDatePicker}>
                     <View style={styles.TextInputContainer} >
-                    <Text style={styles.TextInput}>
+                    <Text 
+                        style={styles.TextInput}
+                        value={data}
+                        onChangeText={setData}
+                    >
                         {date.toLocaleDateString()}
                     </Text>
 
@@ -58,7 +99,7 @@ export default function NovaTransacao({ navigation }) {
                 </View>
                 </TouchableOpacity>
 
-                <Button text="Salvar" onPress={() => navigation.goBack()}/>
+                <Button text="Salvar" onPress={() => addTransacao(nome, valor, data, user.uid)}/>
             </View>
         </SafeAreaView>
     );

@@ -5,7 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { AuthContext } from "../contexts/auth";
 
 import { db } from "../firebaseConnection";
-import { doc, getDoc, setDoc, collection } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
 
 import Button from "../components/Button";
 import ContaCard from "../components/ContaCard";
@@ -16,39 +16,92 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 export default function Home({ navigation }) {
 
     const {user} = useContext(AuthContext)
+    
 
-    const contas = [
-        { id: '1', nome: 'Nubank', saldo: 3000 },
-        { id: '2', nome: 'Carteira', saldo: 150 },
-    ];
-
-    const cartoes = [
-        { id: '1', nome: 'Nubank digital', limite: 2000, fatura: 500 },
-        { id: '2', nome: 'Caixa físico', limite: 1500, fatura: 0 }
-    ];
-
-    const transacoes = [
-        { id: '1', nome: 'Pix recebido', valor: 200, data: '20/03/2025'},
-        { id: '2', nome: 'Mercado', valor: -75.9, data: '21/04/2025' },
-        { id: '3', nome: 'Transporte', valor: -20, data: '22/05/2025' },
-    ];
-
-    const pendencias = [
-        { id: '1', nome: 'Mecânico', valor: 200, data: '20/03/2025'},
-        { id: '2', nome: 'Conta de luz', valor: 300, data: '21/04/2025' },
-        { id: '3', nome: 'Mensalidade curso', valor: 50, data: '22/05/2025' },
-    ];
+    const [contas, setContas] = useState([]);
+    const [cartoes, setCartoes] = useState([]);
+    const [transacoes, setTransacoes] = useState([]);
+    const [pendencias, setPendencias] = useState([]);
 
     const [nome, setNome] = useState('Carregando...');
-    const [saldoTotal, setSaldoTotal] = useState(0);    
+    const [saldoTotal, setSaldoTotal] = useState(0);
+    const [limiteTotal, setLimiteTotal] = useState(0);
+    const [faturaTotal, setFaturaTotal] = useState(0);
 
     useEffect(() => {
         
         async function getDados() {
-            const userSnap = await getDoc(doc(db, "users", user.uid));
-            if(userSnap){
-                setNome(userSnap.data()?.nome)
+            try {
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                if(userSnap){
+                    setNome(userSnap.data()?.nome)
+                }
+
+                const contasRef = collection(db, "contas");
+                const contasQuery = query(contasRef, where("userUid", "==", user.uid))
+                const contasSnap = await getDocs(contasQuery);
+
+                const contasData = [];
+                let saldo = 0;
+
+                contasSnap.forEach((doc) => {
+                    const data = doc.data();
+                    contasData.push({ id: doc.id, ...data });
+                    saldo += data.saldo;
+                });
+
+                setContas(contasData);
+                setSaldoTotal(saldo);
+
+                const cartoesRef = collection(db, "cartoes");
+                const cartoesQuery = query(cartoesRef, where("userUid", "==", user.uid))
+                const cartoesSnap = await getDocs(cartoesQuery);
+
+                const cartoesData = [];
+                let limite = 0;
+                let fatura = 0;
+
+                cartoesSnap.forEach((doc) => {
+                    const data = doc.data();
+                    cartoesData.push({ id: doc.id, ...data });
+                    limite += data.limite;
+                    fatura += data.fatura;
+                });
+
+                setCartoes(cartoesData);
+                setLimiteTotal(limite);
+                setFaturaTotal(fatura);
+
+                const transacoesRef = collection(db, "transacoes");
+                const transacoesQuery = query(transacoesRef, where("userUid", "==", user.uid))
+                const transacoesSnap = await getDocs(transacoesQuery);
+
+                const transacoesData = [];
+
+                transacoesSnap.forEach((doc) => {
+                    const data = doc.data();
+                    transacoesData.push({ id: doc.id, ...data });
+                });
+
+                setTransacoes(transacoesData);
+
+                const pendenciasRef = collection(db, "pendencias");
+                const pendenciasQuery = query(pendenciasRef, where("userUid", "==", user.uid))
+                const pendenciasSnap = await getDocs(pendenciasQuery);
+
+                const pendenciasData = [];
+
+                pendenciasSnap.forEach((doc) => {
+                    const data = doc.data();
+                    pendenciasData.push({ id: doc.id, ...data });
+                });
+
+                setPendencias(pendenciasData);
+                
+            } catch (error) {
+                console.log(error)
             }
+
         }
 
         getDados();
@@ -98,7 +151,7 @@ export default function Home({ navigation }) {
                                 color: '#7F7',
                                 fontWeight: 'bold'
                             }}>
-                                R${saldoTotal.toFixed(2)}
+                                R${limiteTotal.toFixed(2)}
                             </Text>
                         </View>
 
@@ -134,7 +187,7 @@ export default function Home({ navigation }) {
                                 color: '#F33',
                                 fontWeight: 'bold'
                             }}>
-                                R${saldoTotal.toFixed(2)}
+                                R${faturaTotal.toFixed(2)}
                             </Text>
                         </View>
 
@@ -278,7 +331,7 @@ export default function Home({ navigation }) {
     )
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     View:{ 
         flex: 1,
         backgroundColor: '#00695C',
