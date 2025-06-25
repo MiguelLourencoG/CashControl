@@ -1,11 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {SafeAreaView, View, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useRoute } from "@react-navigation/native";
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebaseConnection';
 import Button from '../components/Button';
 
 export default function EditarConta({navigation}){
 
+    const { id } = useRoute().params;
+
     const [nome, setNome] = useState('Carregando...')
     const [saldo, setSaldo] = useState(0);
+
+    useEffect(() => {
+        async function carregarConta() {
+            try {
+                const contaSnap = await getDoc(doc(db, "contas", id));
+
+                if (contaSnap) {
+                    const data = contaSnap.data();
+                    setNome(data.nome);
+                    setSaldo(String(data.saldo.toFixed(2)))
+                } else {
+                    console.log("Conta não encontrada");
+                }
+            } catch (error) {
+                console.error("Erro ao carregar conta:", e);
+            }
+        }
+
+        carregarConta();
+    }, []);
+
+    async function salvarAlteracoes() {
+        try {
+            await updateDoc(doc(db, "contas", id), {
+                nome,
+                saldo: parseFloat(saldo),
+            });
+            navigation.goBack();
+            console.log("Conta atualizada!");
+        } catch (error) {
+            console.error("Erro ao atualizar:", error);
+        }
+    }
 
     return(
         <SafeAreaView style={styles.View}>
@@ -21,10 +59,9 @@ export default function EditarConta({navigation}){
                     <TextInput 
                         style={styles.TextInput}
                         placeholder="ex. Carteira"
-                    >
-                        
-                        {nome}
-                    </TextInput>
+                        value={nome}
+                        onChangeText={setNome}
+                    />
                 </View>
 
                 <Text style={styles.Label}>Saldo:</Text>
@@ -36,16 +73,15 @@ export default function EditarConta({navigation}){
                     <TextInput 
                         style={styles.TextInput}
                         keyboardType="numeric"
-                        placeholder="ex. R$200.50"
-                    >
-                        
-                        {saldo.toFixed(2)}
-                    </TextInput>
+                        placeholder="ex. R$200.50"                        
+                        value={saldo}
+                        onChangeText={setSaldo}
+                    />
                 </View>
                 
                 
                     
-                <Button text="Salvar" onPress={() => navigation.goBack()}/>
+                <Button text="Salvar" onPress={salvarAlteracoes}/>
 
             </View> 
 

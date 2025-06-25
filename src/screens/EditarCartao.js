@@ -1,11 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {SafeAreaView, View, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useRoute } from "@react-navigation/native";
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebaseConnection';
 import Button from '../components/Button';
 
 export default function EditarCartao({navigation}){
 
+    const { id } = useRoute().params;
+    
     const [nome, setNome] = useState('Carregando...')
-    const [saldo, setSaldo] = useState(0);
+    const [limite, setLimite] = useState(0);
+    const [fatura, setFatura] = useState(0)
+
+    useEffect(() => {
+        async function carregarCartao() {
+            try {
+                const cartaoSnap = await getDoc(doc(db, "cartoes", id));
+
+                if (cartaoSnap) {
+                    const data = cartaoSnap.data();
+                    setNome(data.nome);
+                    setLimite(String(data.limite.toFixed(2)))
+                    setFatura(String(data.fatura.toFixed(2)))
+                } else {
+                    console.log("Cartão não encontrado");
+                }
+            } catch (error) {
+                console.error("Erro ao carregar cartão:", e);
+            }
+        }
+
+        carregarCartao();
+    }, []);
+
+    async function salvarAlteracoes() {
+        try {
+            await updateDoc(doc(db, "cartoes", id), {
+                nome,
+                limite: parseFloat(limite),
+                fatura: parseFloat(fatura)
+            });
+            navigation.goBack();
+            console.log("Cartão atualizado!");
+        } catch (error) {
+            console.error("Erro ao atualizar:", error);
+        }
+    }
 
     return(
         <SafeAreaView style={styles.View}>
@@ -22,10 +63,9 @@ export default function EditarCartao({navigation}){
                     <TextInput 
                         style={styles.TextInput}
                         placeholder="ex. Nubank"
-                    >
-                        
-                        {nome}
-                    </TextInput>
+                        value={nome}
+                        onChangeText={setNome}
+                    />
                 </View>
 
                 <Text style={styles.Label}>Limite:</Text>
@@ -37,10 +77,9 @@ export default function EditarCartao({navigation}){
                         style={styles.TextInput}
                         keyboardType="numeric"
                         placeholder="ex. R$200.50"
-                    >
-                        
-                        {saldo.toFixed(2)}
-                    </TextInput>
+                        value={limite}
+                        onChangeText={setLimite}
+                    />
                 </View>
                 
                 <Text style={styles.Label}>Fatura:</Text>
@@ -52,13 +91,12 @@ export default function EditarCartao({navigation}){
                         style={styles.TextInput}
                         keyboardType="numeric"
                         placeholder="ex. R$200.50"
-                    >
-                        
-                        {saldo.toFixed(2)}
-                    </TextInput>
+                        value={fatura}
+                        onChangeText={setFatura}
+                    />
                 </View>
                     
-                <Button text="Salvar" onPress={() => navigation.goBack()}/>
+                <Button text="Salvar" onPress={salvarAlteracoes}/>
 
             </View> 
 

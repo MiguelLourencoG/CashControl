@@ -1,27 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {SafeAreaView, View, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { useRoute } from "@react-navigation/native";
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebaseConnection';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Button from '../components/Button';
 
 export default function EditarTransacao({navigation}){
 
+    const { id } = useRoute().params;
+
     const [nome, setNome] = useState('Carregando...')
-    const [saldo, setSaldo] = useState(0);
+    const [valor, setValor] = useState(0);
+    const [date, setDate] = useState('');
 
-
-    const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
+
+    useEffect(() => {
+        async function getTranscao() {
+            try {
+                const transacaoSnap = await getDoc(doc(db, "transacoes", id));
+
+                if (transacaoSnap) {
+                    const data = transacaoSnap.data();
+                    setNome(data.nome);
+                    setValor(String(data.valor.toFixed(2)))
+                    setDate(data.data)
+                } else {
+                    console.log("Transação não encontrada");
+                    
+                }
+            } catch (error) {
+                console.error("Erro ao carregar transação:", error);
+            }
+        }
+
+        getTranscao();
+    }, []);
 
     const onChange = (event, selectedDate) => {
         setShow(Platform.OS === 'ios');
         if (selectedDate) {
-            setDate(selectedDate);
+
+            setDate(selectedDate.toLocaleDateString());
         }
     };
 
     const showDatePicker = () => {
         setShow(true);
     };
+
+    function formatDateString(str) {
+        const [dia, mes, ano] = str.split('/');
+        return new Date(ano, mes - 1, dia);
+    }
+
+    async function salvarAlteracoes() {
+        try {
+            await updateDoc(doc(db, "transacoes", id), {
+                nome,
+                valor: parseFloat(valor),
+                date
+            });
+            navigation.goBack();
+            console.log("Transação atualizada!");
+        } catch (error) {
+            console.error("Erro ao atualizar:", error);
+        }
+    }
 
     return(
         <SafeAreaView style={styles.View}>
@@ -36,11 +82,10 @@ export default function EditarTransacao({navigation}){
                 <View style={styles.TextInputContainer}>
                     <TextInput 
                         style={styles.TextInput}
-                        placeholder="ex. Transporte"
-                    >
-                        
-                        {nome}
-                    </TextInput>
+                        placeholder="ex. Carteira"
+                        value={nome}
+                        onChangeText={setNome}
+                    />
                 </View>
 
                 <Text style={styles.Label}>Valor:</Text>
@@ -51,23 +96,22 @@ export default function EditarTransacao({navigation}){
                     <TextInput 
                         style={styles.TextInput}
                         keyboardType="numeric"
-                        placeholder="ex. R$ -9.99"
-                    >
-                        
-                        {saldo.toFixed(2)}
-                    </TextInput>
+                        placeholder="ex. R$200.50"                        
+                        value={valor}
+                        onChangeText={setValor}
+                    />
                 </View>
                 
                 <Text style={styles.Label}>Data:</Text>
                 <TouchableOpacity onPress={showDatePicker}>
                     <View style={styles.TextInputContainer} >
                     <Text style={styles.TextInput}>
-                        {date.toLocaleDateString()}
+                        {date}
                     </Text>
 
                     {show && (
                         <DateTimePicker
-                        value={date}
+                        value={formatDateString(date)}
                         mode="date"
                         display="default"
                         onChange={onChange}
@@ -76,7 +120,7 @@ export default function EditarTransacao({navigation}){
                 </View>
                 </TouchableOpacity>
                     
-                <Button text="Salvar" onPress={() => navigation.goBack()}/>
+                <Button text="Salvar" onPress={salvarAlteracoes}/>
 
             </View> 
 

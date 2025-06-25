@@ -1,14 +1,37 @@
-import React from "react";
+import React, {useState, useEffect, useContext} from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
+import { db } from "../firebaseConnection";
+import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+
+import { AuthContext } from "../contexts/auth";
 import { Feather } from '@expo/vector-icons';
 
 export default function Contas({navigation}){
 
-    const contas = [
-        { id: '1', nome: 'Nubank', saldo: 2500 },
-        { id: '2', nome: 'Carteira', saldo: 150 },
-    ];
+    const {user} = useContext(AuthContext)
+
+    const [contas, setContas] = useState([]);
+
+    useEffect(( ) => {
+        async function getContas() {
+            const contasRef = collection(db, "contas");
+            const contasQuery = query(contasRef, where("userUid", "==", user.uid))
+            const contasSnap = await getDocs(contasQuery);
+
+            const contasData = [];
+            let saldo = 0;
+
+            contasSnap.forEach((doc) => {
+                const data = doc.data();
+                contasData.push({ id: doc.id, ...data });
+            });
+
+            setContas(contasData);
+        }
+        
+        getContas();
+    }, [])
 
     return(
         <SafeAreaView style={styles.View}>
@@ -20,7 +43,7 @@ export default function Contas({navigation}){
             <View style={styles.Container}>
                 
                 {contas.map((item) => (
-                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarConta')}>
+                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarConta', {id: item.id})}>
                 
                         <View style={{ flex: 1 }}>
                             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.nome}</Text>

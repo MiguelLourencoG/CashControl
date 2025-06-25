@@ -9,7 +9,7 @@ export default function PendenciaCard({ id, nome, valor, data }) {
         <View>
             <TouchableOpacity 
                 style={styles.Item} 
-                onPress={() => navigation.navigate('EditarPendencia')}
+                onPress={() => navigation.navigate('EditarPendencia', {id: id})}
             >
                 
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>

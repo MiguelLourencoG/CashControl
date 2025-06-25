@@ -9,7 +9,7 @@ export default function TransacaoCard({ id, nome, valor, data }) {
         <View>
             <TouchableOpacity 
                 style={styles.Item} 
-                onPress={() => navigation.navigate('EditarTransacao')}
+                onPress={() => navigation.navigate('EditarTransacao', {id: id})}
             >
                 
                 <View

@@ -212,7 +212,7 @@ export default function Home({ navigation }) {
                             contentContainerStyle={styles.ScrollContent}
                         >
                             {contas.map((conta) => (
-                                <ContaCard key={conta.id} nome={conta.nome} saldo={conta.saldo} />
+                                <ContaCard key={conta.id} id={conta.id} nome={conta.nome} saldo={conta.saldo} />
                             ))}
 
                             
@@ -242,7 +242,7 @@ export default function Home({ navigation }) {
                             contentContainerStyle={styles.ScrollContent}
                         >
                             {cartoes.map((cartao) => (
-                                <CartaoCard key={cartao.id} nome={cartao.nome} limite={cartao.limite} fatura={cartao.fatura}/>
+                                <CartaoCard key={cartao.id} id={cartao.id} nome={cartao.nome} limite={cartao.limite} fatura={cartao.fatura}/>
                             ))}
 
                             
@@ -271,7 +271,7 @@ export default function Home({ navigation }) {
                             <TouchableOpacity 
                                 key={item.id} 
                                 style={styles.Item}
-                                onPress={() => navigation.navigate('EditarTransacao')}
+                                onPress={() => navigation.navigate('EditarTransacao', {id: item.id})}
                             >
                                 <View>
                                     <Text style={{fontSize: 20,}}>{item.nome}</Text>
@@ -302,7 +302,7 @@ export default function Home({ navigation }) {
                             <TouchableOpacity 
                                 key={item.id} 
                                 style={styles.Item}
-                                onPress={() => navigation.navigate('EditarPendencia')}
+                                onPress={() => navigation.navigate('EditarPendencia', {id: item.id})}
                             >
                                 <View>
                                     <Text style={{fontSize: 20,}}>{item.nome}</Text>
@@ -322,8 +322,6 @@ export default function Home({ navigation }) {
 
                     </View>
                     
-                    <Text style={styles.ContainerTitle}>Gráficos</Text>
-
                 </View>
 
             </ScrollView>           

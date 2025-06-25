@@ -1,14 +1,43 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
+import { db } from "../firebaseConnection";
+import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+
+import { AuthContext } from "../contexts/auth";
 import { Feather } from '@expo/vector-icons';
 
 export default function Cartoes({navigation}){
 
-    const cartoes = [
-        { id: '1', nome: 'Nubank digital', limite: 2000, fatura: 500 },
-        { id: '2', nome: 'Caixa físico', limite: 1500, fatura: 0 }
-    ];
+    const {user} = useContext(AuthContext)
+
+    const [cartoes, setCartoes] = useState([]);
+
+    useEffect(() =>{
+        async function getCartoes() {
+            const cartoesRef = collection(db, "cartoes");
+            const cartoesQuery = query(cartoesRef, where("userUid", "==", user.uid))
+            const cartoesSnap = await getDocs(cartoesQuery);
+
+            const cartoesData = [];
+            let limite = 0;
+            let fatura = 0;
+
+            cartoesSnap.forEach((doc) => {
+                const data = doc.data();
+                cartoesData.push({ id: doc.id, ...data });
+                limite += data.limite;
+                fatura += data.fatura;
+            });
+
+            setCartoes(cartoesData);
+            setLimiteTotal(limite);
+            setFaturaTotal(fatura);
+        }
+
+        getCartoes();
+    }, [])
+
 
     return(
         <SafeAreaView style={styles.View}>
@@ -20,7 +49,7 @@ export default function Cartoes({navigation}){
             <View style={styles.Container}>
                 
                 {cartoes.map((item) => (
-                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarCartao')}>
+                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarCartao', { id: item.id })}>
                 
                         <View style={{ flex: 1 }}>
                             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.nome}</Text>

@@ -1,16 +1,46 @@
-import React from "react";
+import React, { useEffect, useState, useContext} from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 import AddButtom from "../components/AddButton";
 import PendenciaCard from '../components/PendenciaCard';
 
+import { db } from "../firebaseConnection";
+import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+
+import { AuthContext } from "../contexts/auth";
+import { Feather } from '@expo/vector-icons';
+
+
 export default function Pendencias({navigation}){
 
-    const pendencias = [
-        { id: '1', nome: 'Mecânico', valor: 200, data: '20/03/2025'},
-        { id: '2', nome: 'Conta de luz', valor: 300, data: '21/04/2025' },
-        { id: '3', nome: 'Mensalidade curso', valor: 50, data: '22/05/2025' },
-    ];
+    const {user} = useContext(AuthContext)
+        
+    const [pendencias, setPendenciass] = useState([]);
+
+    //const pendencias = [
+    //    { id: '1', nome: 'Mecânico', valor: 200, data: '20/03/2025'},
+    //    { id: '2', nome: 'Conta de luz', valor: 300, data: '21/04/2025' },
+    //    { id: '3', nome: 'Mensalidade curso', valor: 50, data: '22/05/2025' },
+    //];
+
+    useEffect(( ) => {
+        async function getPendenciass() {
+            const pendenciasRef = collection(db, "pendencias");
+            const pendenciasQuery = query(pendenciasRef, where("userUid", "==", user.uid))
+            const pendenciasSnap = await getDocs(pendenciasQuery);
+
+            const pendenciasData = [];
+
+            pendenciasSnap.forEach((doc) => {
+                const data = doc.data();
+                pendenciasData.push({ id: doc.id, ...data });
+            });
+
+            setPendenciass(pendenciasData);
+        }
+        
+        getPendenciass();
+    }, [])
 
     return(
         <SafeAreaView style={styles.View}>
@@ -23,7 +53,9 @@ export default function Pendencias({navigation}){
                 {pendencias.map((item) => (
 
                     <PendenciaCard 
-                        key={item.id} nome={item.nome}
+                        key={item.id} 
+                        id = {item.id}
+                        nome={item.nome}
                         valor={item.valor}
                         data={item.data}
                     />

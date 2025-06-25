@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 
-export default function ContaCard({ nome, saldo }) {
+export default function ContaCard({ id, nome, saldo }) {
   const navigation = useNavigation();
   return (
     <TouchableOpacity 
       style={styles.Card}
-      onPress={() => navigation.navigate('EditarConta')}
+      onPress={() => navigation.navigate('EditarConta', {id: id})}
     >
       <Text
         style={styles.Nome}

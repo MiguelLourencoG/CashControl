@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useContext} from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -6,13 +6,36 @@ import TransacaoCard from '../components/TransacaoCard'
 import Button from "../components/Button";
 import AddButtom from "../components/AddButton";
 
+import { db } from "../firebaseConnection";
+import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+
+import { AuthContext } from "../contexts/auth";
+import { Feather } from '@expo/vector-icons';
+
 export default function Transacoes({navigation}){
 
-    const transacoes = [
-        { id: '1', nome: 'Pix recebido', valor: 200, data: '20/03/2025'},
-        { id: '2', nome: 'Mercado', valor: -75.9, data: '21/04/2025' },
-        { id: '3', nome: 'Transporte', valor: -20, data: '22/05/2025' },
-    ];
+    const {user} = useContext(AuthContext)
+    
+    const [transacoes, setTransacoes] = useState([]);
+
+    useEffect(( ) => {
+            async function getTransacoes() {
+                const transacoesRef = collection(db, "transacoes");
+                const transacoesQuery = query(transacoesRef, where("userUid", "==", user.uid))
+                const transacoesSnap = await getDocs(transacoesQuery);
+    
+                const transacoesData = [];
+    
+                transacoesSnap.forEach((doc) => {
+                    const data = doc.data();
+                    transacoesData.push({ id: doc.id, ...data });
+                });
+    
+                setTransacoes(transacoesData);
+            }
+            
+            getTransacoes();
+        }, [])
 
     return(
         <SafeAreaView style={styles.View}>
@@ -23,7 +46,7 @@ export default function Transacoes({navigation}){
             <View style={styles.Container}>
                 
                 {transacoes.map((item) => (
-                    <TransacaoCard key={item.id} nome={item.nome} valor={item.valor} data={item.data}/>                      
+                    <TransacaoCard key={item.id} id={item.id} nome={item.nome} valor={item.valor} data={item.data}/>      
                 ))}
 
             </View>
