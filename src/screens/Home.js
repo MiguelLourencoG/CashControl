@@ -5,7 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { AuthContext } from "../contexts/auth";
 
 import { db } from "../firebaseConnection";
-import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection, query, where, onSnapshot } from "firebase/firestore";
 
 import Button from "../components/Button";
 import ContaCard from "../components/ContaCard";
@@ -32,71 +32,79 @@ export default function Home({ navigation }) {
         
         async function getDados() {
             try {
-                const userSnap = await getDoc(doc(db, "users", user.uid));
-                if(userSnap){
-                    setNome(userSnap.data()?.nome)
-                }
+                //Nome
+                onSnapshot(doc(db, "users", user.uid), (doc)=>{
+                    setNome(doc.data()?.nome)
+                })
 
+                //Contas
                 const contasRef = collection(db, "contas");
                 const contasQuery = query(contasRef, where("userUid", "==", user.uid))
-                const contasSnap = await getDocs(contasQuery);
+                
+                onSnapshot(contasQuery, (querySnapshot) => {
+                    const contasData = [];
+                    let saldo = 0;
 
-                const contasData = [];
-                let saldo = 0;
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        contasData.push({ id: doc.id, ...data });
+                        saldo += data.saldo;
+                    })
 
-                contasSnap.forEach((doc) => {
-                    const data = doc.data();
-                    contasData.push({ id: doc.id, ...data });
-                    saldo += data.saldo;
+                    setContas(contasData);
+                    setSaldoTotal(saldo);
                 });
 
-                setContas(contasData);
-                setSaldoTotal(saldo);
-
+                //Cartões
                 const cartoesRef = collection(db, "cartoes");
                 const cartoesQuery = query(cartoesRef, where("userUid", "==", user.uid))
-                const cartoesSnap = await getDocs(cartoesQuery);
+                
+                onSnapshot(cartoesQuery, (querySnapshot) => {
+                    const cartoesData = [];
+                    let limite = 0;
+                    let fatura = 0
 
-                const cartoesData = [];
-                let limite = 0;
-                let fatura = 0;
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        cartoesData.push({ id: doc.id, ...data });
+                        limite += data.limite;
+                        fatura += data.fatura;
+                    });
 
-                cartoesSnap.forEach((doc) => {
-                    const data = doc.data();
-                    cartoesData.push({ id: doc.id, ...data });
-                    limite += data.limite;
-                    fatura += data.fatura;
+                    setCartoes(cartoesData);
+                    setLimiteTotal(limite);
+                    setFaturaTotal(fatura);
                 });
 
-                setCartoes(cartoesData);
-                setLimiteTotal(limite);
-                setFaturaTotal(fatura);
-
+                //Transações
                 const transacoesRef = collection(db, "transacoes");
                 const transacoesQuery = query(transacoesRef, where("userUid", "==", user.uid))
-                const transacoesSnap = await getDocs(transacoesQuery);
 
-                const transacoesData = [];
+                onSnapshot(transacoesQuery, (querySnapshot) => {
+                    const transacoesData = [];
 
-                transacoesSnap.forEach((doc) => {
-                    const data = doc.data();
-                    transacoesData.push({ id: doc.id, ...data });
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        transacoesData.push({ id: doc.id, ...data });
+                    });
+
+                    setTransacoes(transacoesData);
                 });
 
-                setTransacoes(transacoesData);
-
+                //Pendências
                 const pendenciasRef = collection(db, "pendencias");
                 const pendenciasQuery = query(pendenciasRef, where("userUid", "==", user.uid))
-                const pendenciasSnap = await getDocs(pendenciasQuery);
 
-                const pendenciasData = [];
+                onSnapshot(pendenciasQuery, (querySnapshot) => {
+                    const pendenciasData = [];
 
-                pendenciasSnap.forEach((doc) => {
-                    const data = doc.data();
-                    pendenciasData.push({ id: doc.id, ...data });
-                });
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        pendenciasData.push({ id: doc.id, ...data });
+                    });
 
-                setPendencias(pendenciasData);
+                    setPendencias(pendenciasData);
+                });               
                 
             } catch (error) {
                 console.log(error)

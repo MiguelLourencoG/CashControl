@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 import { db } from "../firebaseConnection";
-import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection, query, where, onSnapshot, deleteDoc} from "firebase/firestore";
 
 import { AuthContext } from "../contexts/auth";
 import { Feather } from '@expo/vector-icons';
@@ -15,23 +15,35 @@ export default function Contas({navigation}){
 
     useEffect(( ) => {
         async function getContas() {
-            const contasRef = collection(db, "contas");
-            const contasQuery = query(contasRef, where("userUid", "==", user.uid))
-            const contasSnap = await getDocs(contasQuery);
+            try {
+                const contasRef = collection(db, "contas");
+                const contasQuery = query(contasRef, where("userUid", "==", user.uid))
+                
+                onSnapshot(contasQuery, (querySnapshot) => {
+                    const contasData = [];
 
-            const contasData = [];
-            let saldo = 0;
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        contasData.push({ id: doc.id, ...data });
+                    })
 
-            contasSnap.forEach((doc) => {
-                const data = doc.data();
-                contasData.push({ id: doc.id, ...data });
-            });
-
-            setContas(contasData);
+                    setContas(contasData);
+                });
+            } catch (error) {
+                console.log(error)
+            }
         }
         
         getContas();
     }, [])
+
+    async function handleDelete(id){            
+        try {
+            await deleteDoc(doc( db, "contas", id))
+        } catch (error) {
+            console.log(error)
+        }        
+    }
 
     return(
         <SafeAreaView style={styles.View}>
@@ -43,7 +55,7 @@ export default function Contas({navigation}){
             <View style={styles.Container}>
                 
                 {contas.map((item) => (
-                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarConta', {id: item.id})}>
+                    <TouchableOpacity key={item.id} id={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarConta', {id: item.id})}>
                 
                         <View style={{ flex: 1 }}>
                             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.nome}</Text>
@@ -53,8 +65,13 @@ export default function Contas({navigation}){
                                     R$ {item.saldo.toFixed(2)}
                                 </Text>
 
-                                <TouchableOpacity style={styles.Delete}>
-                                    <Feather name="trash-2" size={24} color="#fff" />
+                                <TouchableOpacity style={styles.Delete} 
+                                    onPress={(event) => {
+                                        event.stopPropagation();
+                                        handleDelete(item.id);
+                                    }}
+                                >
+                                    <Feather name="trash-2" size={30} color="#fff" />
                                 </TouchableOpacity>
                             </View>
                         </View>                        

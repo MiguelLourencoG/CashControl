@@ -2,9 +2,22 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from '@expo/vector-icons';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../firebaseConnection';
 
 export default function TransacaoCard({ id, nome, valor, data }) {
     const navigation = useNavigation();
+
+    async function handleDelete(){
+        
+        try {
+            await deleteDoc(doc( db, "transacoes", id))
+        } catch (error) {
+            console.log(error)
+        }
+        
+    }
+
     return (
         <View>
             <TouchableOpacity 
@@ -43,7 +56,12 @@ export default function TransacaoCard({ id, nome, valor, data }) {
                     </View>
                 </View>
                 
-                <TouchableOpacity style={styles.Delete}>
+                <TouchableOpacity style={styles.Delete} 
+                    onPress={(event) => {
+                        event.stopPropagation();
+                        handleDelete();
+                    }}
+                >
                     <Feather name="trash-2" size={30} color="#fff" />
                 </TouchableOpacity>
                 

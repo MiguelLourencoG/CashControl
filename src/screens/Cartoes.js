@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 import { db } from "../firebaseConnection";
-import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection, query, where, onSnapshot, deleteDoc} from "firebase/firestore";
 
 import { AuthContext } from "../contexts/auth";
 import { Feather } from '@expo/vector-icons';
@@ -15,29 +15,39 @@ export default function Cartoes({navigation}){
 
     useEffect(() =>{
         async function getCartoes() {
-            const cartoesRef = collection(db, "cartoes");
-            const cartoesQuery = query(cartoesRef, where("userUid", "==", user.uid))
-            const cartoesSnap = await getDocs(cartoesQuery);
 
-            const cartoesData = [];
-            let limite = 0;
-            let fatura = 0;
+            try {
+                const cartoesRef = collection(db, "cartoes");
+                const cartoesQuery = query(cartoesRef, where("userUid", "==", user.uid))
 
-            cartoesSnap.forEach((doc) => {
-                const data = doc.data();
-                cartoesData.push({ id: doc.id, ...data });
-                limite += data.limite;
-                fatura += data.fatura;
-            });
+                onSnapshot(cartoesQuery, (querySnapshot) => {
+                    const cartoesData = [];
 
-            setCartoes(cartoesData);
-            setLimiteTotal(limite);
-            setFaturaTotal(fatura);
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        cartoesData.push({ id: doc.id, ...data });
+                    });
+
+                    setCartoes(cartoesData);
+                });
+            } catch (error) {
+                console.log(error)
+            }
+
+            
         }
 
         getCartoes();
     }, [])
 
+    async function handleDelete(id){            
+        try {
+            await deleteDoc(doc( db, "cartoes", id))
+        } catch (error) {
+            console.log(error)
+        }
+        
+    }
 
     return(
         <SafeAreaView style={styles.View}>
@@ -49,7 +59,7 @@ export default function Cartoes({navigation}){
             <View style={styles.Container}>
                 
                 {cartoes.map((item) => (
-                    <TouchableOpacity key={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarCartao', { id: item.id })}>
+                    <TouchableOpacity key={item.id} id={item.id} style={styles.Item} onPress={() => navigation.navigate('EditarCartao', { id: item.id })}>
                 
                         <View style={{ flex: 1 }}>
                             <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{item.nome}</Text>
@@ -62,8 +72,13 @@ export default function Cartoes({navigation}){
                                     R$ {item.fatura.toFixed(2)}
                                 </Text>
 
-                                <TouchableOpacity style={styles.Delete}>
-                                    <Feather name="trash-2" size={24} color="#fff" />
+                                <TouchableOpacity style={styles.Delete} 
+                                    onPress={(event) => {
+                                        event.stopPropagation();
+                                        handleDelete(item.id);
+                                    }}
+                                >
+                                    <Feather name="trash-2" size={30} color="#fff" />
                                 </TouchableOpacity>
                             </View>
                         </View>                        

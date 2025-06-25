@@ -1,16 +1,13 @@
 import React, { useEffect, useState, useContext} from "react";
 import {SafeAreaView, View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import TransacaoCard from '../components/TransacaoCard'
-import Button from "../components/Button";
 import AddButtom from "../components/AddButton";
 
 import { db } from "../firebaseConnection";
-import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection, query, where, onSnapshot } from "firebase/firestore";
 
 import { AuthContext } from "../contexts/auth";
-import { Feather } from '@expo/vector-icons';
 
 export default function Transacoes({navigation}){
 
@@ -19,23 +16,27 @@ export default function Transacoes({navigation}){
     const [transacoes, setTransacoes] = useState([]);
 
     useEffect(( ) => {
-            async function getTransacoes() {
+        async function getTransacoes() {
+            try {
                 const transacoesRef = collection(db, "transacoes");
                 const transacoesQuery = query(transacoesRef, where("userUid", "==", user.uid))
-                const transacoesSnap = await getDocs(transacoesQuery);
-    
-                const transacoesData = [];
-    
-                transacoesSnap.forEach((doc) => {
-                    const data = doc.data();
-                    transacoesData.push({ id: doc.id, ...data });
+
+                onSnapshot(transacoesQuery, (querySnapshot) => {
+                    const transacoesData = [];
+
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        transacoesData.push({ id: doc.id, ...data });
+                    });
+
+                    setTransacoes(transacoesData);
                 });
-    
-                setTransacoes(transacoesData);
+            } catch (error) {
+                console.log(error)
             }
-            
-            getTransacoes();
-        }, [])
+        }
+        getTransacoes(); 
+    }, [])
 
     return(
         <SafeAreaView style={styles.View}>

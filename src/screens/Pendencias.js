@@ -5,7 +5,7 @@ import AddButtom from "../components/AddButton";
 import PendenciaCard from '../components/PendenciaCard';
 
 import { db } from "../firebaseConnection";
-import { doc, getDoc, getDocs, setDoc, collection, query, where } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection, query, where, onSnapshot} from "firebase/firestore";
 
 import { AuthContext } from "../contexts/auth";
 import { Feather } from '@expo/vector-icons';
@@ -15,31 +15,31 @@ export default function Pendencias({navigation}){
 
     const {user} = useContext(AuthContext)
         
-    const [pendencias, setPendenciass] = useState([]);
+    const [pendencias, setPendencias] = useState([]);
 
-    //const pendencias = [
-    //    { id: '1', nome: 'Mecânico', valor: 200, data: '20/03/2025'},
-    //    { id: '2', nome: 'Conta de luz', valor: 300, data: '21/04/2025' },
-    //    { id: '3', nome: 'Mensalidade curso', valor: 50, data: '22/05/2025' },
-    //];
 
     useEffect(( ) => {
-        async function getPendenciass() {
-            const pendenciasRef = collection(db, "pendencias");
-            const pendenciasQuery = query(pendenciasRef, where("userUid", "==", user.uid))
-            const pendenciasSnap = await getDocs(pendenciasQuery);
+        async function getPendencias() {
+            try {
+               const pendenciasRef = collection(db, "pendencias");
+                const pendenciasQuery = query(pendenciasRef, where("userUid", "==", user.uid))
 
-            const pendenciasData = [];
+                onSnapshot(pendenciasQuery, (querySnapshot) => {
+                    const pendenciasData = [];
 
-            pendenciasSnap.forEach((doc) => {
-                const data = doc.data();
-                pendenciasData.push({ id: doc.id, ...data });
-            });
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        pendenciasData.push({ id: doc.id, ...data });
+                    });
 
-            setPendenciass(pendenciasData);
+                    setPendencias(pendenciasData);
+                }); 
+            } catch (error) {
+                console.log(error)
+            }
         }
         
-        getPendenciass();
+        getPendencias();
     }, [])
 
     return(
@@ -54,7 +54,7 @@ export default function Pendencias({navigation}){
 
                     <PendenciaCard 
                         key={item.id} 
-                        id = {item.id}
+                        id={item.id}
                         nome={item.nome}
                         valor={item.valor}
                         data={item.data}
