@@ -3,9 +3,11 @@ import { SafeAreaView, Text, StyleSheet, TouchableOpacity } from "react-native";
 export default function Button({text, onPress}){
     return(
         <SafeAreaView>
+            <SafeAreaView>
             <TouchableOpacity style={styles.Button} onPress={onPress}>
                 <Text style={styles.ButtonText}>{text}</Text>
             </TouchableOpacity>
+        </SafeAreaView>
         </SafeAreaView>
     );
 }
@@ -20,6 +22,7 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     ButtonText: {
+        textAlign: 'center',
         color: '#FFFFFF',
         fontSize: 30,
         fontWeight: 'bold',

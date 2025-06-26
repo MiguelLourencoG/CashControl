@@ -10,47 +10,43 @@ import Button from "../components/Button";
 
 export default function Login({ navigation  }) {
 
-    const {login} = useContext(AuthContext)
+    const {resetSenha} = useContext(AuthContext)
 
     const [email, setEmail] = useState("")
     const [senha, setSenha] = useState("")
 
     const [authUser, setAuthUser] = useState(null)
 
-    const [errors, setErrors] = useState({})
+    const [mensagem, setMensagem] = useState(null)
 
-    function validarCampos() {
-        let e = {}
+    async function handleSenha(){
+        setMensagem(null);
+        const erro = await resetSenha(email);
 
-        if (!senha) e.geral = "A senha não pode ficar vazia"
-        if (!email) e.geral = "O email não pode ficar vazio"
-                
-        if(senha && senha.length < 8) e.geral = "A senha não pode ter menos de 8 caractéres"
-                
-        setErrors(e)
-        return Object.keys(e).length === 0;
-       
-    }
-
-    async function handleLogin(){
-
-        if (!validarCampos()) {
-            return;
+        if (erro) {
+            setMensagem({ tipo: "erro", texto: erro });
+        } else {
+            setMensagem({ tipo: "sucesso", texto: "Email de recuperação enviado com sucesso! Se não encontrar, verifique o spam ou a lixeira!" });
         }
-
-        const erro = await login(email, senha)
-
-        if(erro) setErrors((prev) => ({ ...prev, geral: erro }))
     }
 
     return(
         <SafeAreaView style={Styles.View}>
             <View style={Styles.TitleContainer}>
-                <Text style={Styles.Title}>Login</Text>
+                <Text style={Styles.Title}>Esqueci a senha</Text>
             </View>            
             <View style={Styles.Container}>
+                {mensagem && (
+                    <Text style={{
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: mensagem.tipo === "erro" ? "red" : "#00695C",
+                        marginBottom: 10
+                    }}>
+                        {mensagem.texto}
+                    </Text>
+                )}
 
-                {errors.geral ? <Text style={Styles.Erro}>{errors.geral}</Text> : null}
 
                 <Text style={Styles.Text}>Email:</Text>
                 <TextInput 
@@ -62,39 +58,19 @@ export default function Login({ navigation  }) {
                     onChangeText={(text) => setEmail(text)}
                     style={Styles.TextInput}
                 />
-                
-
-                <Text style={Styles.Text}>Senha:</Text>
-                <TextInput 
-                    placeholder="Digite sua senha..."
-                    autoCapitalize="none"
-                    secureTextEntry
-                    autoCorrect={false}
-                    value={senha}
-                    onChangeText={(text) => setSenha(text)}
-                    style={Styles.TextInput}
-                />
-
-                
-
-                <View style={{ alignItems: 'center', marginTop: 4}}>
-                    <Text style={{fontSize: 21}}>
-                        Esqueceu sua senha?
-                            <Text 
-                                style={Styles.TextLink} 
-                                onPress={() => navigation.navigate("Senha")}> Clique aqui!
-                            </Text>
-                    </Text>
-                </View>
-
-                <Button text="Entrar" onPress={handleLogin}/>
+                               
+                <SafeAreaView>
+                    <TouchableOpacity style={Styles.Button} onPress={handleSenha}>
+                        <Text style={Styles.ButtonText}>Enviar email de recuperação</Text>
+                    </TouchableOpacity>
+                </SafeAreaView>
 
                 <View style={{ alignItems: 'center'}}>
                     <Text style={{fontSize: 21}}>
-                        Não possui uma conta?
+                        Deseja voltar ao login?
                             <Text 
                                 style={Styles.TextLink} 
-                                onPress={() => navigation.navigate("SignUp")}> Clique aqui!
+                                onPress={() => navigation.goBack()}> Clique aqui!
                             </Text>
                     </Text>
                 </View>
@@ -156,11 +132,18 @@ const Styles = StyleSheet.create({
         fontWeight: 'bold',
         
     },
-
-    Erro: {
-        color: 'red',
-        fontSize: 22,
-        marginTop: 4,
-        marginLeft: 4,
-    }
+    Button: {
+        backgroundColor: '#00695C',
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 20,
+        elevation: 2,
+    },
+    ButtonText: {
+        textAlign: 'center',
+        color: '#FFFFFF',
+        fontSize: 25,
+        fontWeight: 'bold',
+    },
 })

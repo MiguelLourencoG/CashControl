@@ -63,7 +63,7 @@ export const styles = StyleSheet.create({
 
   Fatura:{
     fontSize: 16,
-    color: '#733',
+    color: 'red',
     marginTop: 4,
   }
 });

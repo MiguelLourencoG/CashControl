@@ -1,6 +1,6 @@
 import React, {useState, useContext} from "react";
 import { SafeAreaView, View, Text, StyleSheet, TextInput } from "react-native";
-
+import { collection, query, where, getDocs } from "firebase/firestore";
 import Button from "../components/Button";
 
 
@@ -15,8 +15,37 @@ export default function SignUp({ navigation }) {
     const [email, setEmail] = useState("")
     const [senha, setSenha] = useState("")
 
+    function validarEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    }
+
+
+    const [errors, setErrors] = useState({})
+
+    function validarCampos() {
+        let e = {}
+    
+        if(senha && senha.length < 8) e.geral = "Senha não pode ter menos de 8 caractéres"
+
+        if (!senha) e.geral = "A senha não pode ficar vazio"
+        if (!email) e.geral = "O email não pode ficar vazio"
+        if (!nome) e.geral = "O nome não pode ficar vazio"
+        
+
+        setErrors(e)
+        return Object.keys(e).length === 0;
+       
+    }
+
+
     function handleSignUp(){
-        signUp(nome, email, senha);
+        if (!validarCampos()) {
+            return;
+        }
+        const erro = signUp(nome, email, senha);
+
+        if(erro) setErrors((prev) => ({ ...prev, geral: erro }))
     }
 
     return(
@@ -25,6 +54,9 @@ export default function SignUp({ navigation }) {
                 <Text style={Styles.Title}>Cadastro</Text>
             </View>
             <View style={Styles.Container}>
+
+                {errors.geral ? <Text style={Styles.Erro}>{errors.geral}</Text> : null}
+
                 <Text style={Styles.Text}>Nome:</Text>
                 <TextInput 
                     placeholder="Digite seu nome..."
@@ -124,5 +156,12 @@ const Styles = StyleSheet.create({
         color: '#00695C', 
         fontWeight: 'bold',
         
+    },
+
+    Erro: {
+        color: 'red',
+        fontSize: 22,
+        marginTop: 4,
+        marginLeft: 4,
     }
 })

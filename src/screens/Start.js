@@ -19,7 +19,7 @@ export default function Start({ navigation }) {
                     <View style={Styles.Line} />
                     <Text style={Styles.Text}>Bora ver por onde anda seu dinheiro?</Text>
                 </View>
-                <View >                    
+                <View style={{bottom: 30}}>                    
                     <Text style={Styles.TextBottom}>Vamos começar criando uma conta</Text>
                     <Button text={'Criar Conta'} onPress={() => navigation.navigate("SignUp")}/>
                                         
@@ -59,22 +59,25 @@ const Styles = StyleSheet.create({
     Title:{
         marginHorizontal: 'auto',
         marginBottom: 5,
-        fontSize: 45,
+        fontSize: 42,
         fontWeight: 'bold'
     },
 
     Line:{
         borderBottomWidth: 0.5,
-        marginBottom: 12
+        marginBottom: 5
     },
 
     Text:{
-        fontSize: 35,
+        fontSize: 33,
+        textAlign: 'center',
+        marginBottom: 5
     },
 
     TextBottom:{
-        fontSize: 22,
-        textAlign: 'center'
+        fontSize: 20,
+        textAlign: 'center',
+        bottom: -10
     },
 
     Button: {

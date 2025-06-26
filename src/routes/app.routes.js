@@ -11,9 +11,6 @@ import Cartoes from "../screens/Cartoes";
 import Contas from "../screens/Contas";
 import Transacoes from "../screens/Transacoes";
 import Pendencias from "../screens/Pendencias";
-import VerCartao from "../screens/VerCartao";
-import VerConta from "../screens/VerConta";
-import VerTransacao from "../screens/VerTransacao";
 import EditarConta from "../screens/EditarConta";
 import EditarCartao from "../screens/EditarCartao";
 import EditarTransacao from "../screens/EditarTransacao";
@@ -35,9 +32,6 @@ function AppRoutes(){
         <Stack.Screen name="Contas" component={Contas}/>
         <Stack.Screen name="Transacoes" component={Transacoes}/>
         <Stack.Screen name="Pendencias" component={Pendencias}/>
-        <Stack.Screen name="VerCartao" component={VerCartao}/>
-        <Stack.Screen name="VerConta" component={VerConta}/>
-        <Stack.Screen name="VerTransacao" component={VerTransacao}/>
         <Stack.Screen name="EditarConta" component={EditarConta}/>
         <Stack.Screen name="EditarCartao" component={EditarCartao}/>
         <Stack.Screen name="EditarTransacao" component={EditarTransacao}/>
