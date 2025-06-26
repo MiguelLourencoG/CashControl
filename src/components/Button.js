@@ -3,12 +3,12 @@ import { SafeAreaView, Text, StyleSheet, TouchableOpacity } from "react-native";
 export default function Button({text, onPress}){
     return(
         <SafeAreaView>
-            <SafeAreaView>
+            
             <TouchableOpacity style={styles.Button} onPress={onPress}>
                 <Text style={styles.ButtonText}>{text}</Text>
             </TouchableOpacity>
         </SafeAreaView>
-        </SafeAreaView>
+        
     );
 }
 
