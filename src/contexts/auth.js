@@ -29,6 +29,7 @@ function AuthProvider({children}){
     }, [])
 
     async function signUp(nome, email, senha) {
+        setLoadingAuth(true)
         try{
             const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
             const user = userCredential.user;
@@ -40,17 +41,18 @@ function AuthProvider({children}){
                 console.log("Tudo nos trinques")
                 login(email, senha)
             })
+            setLoadingAuth(false)
             return null
         }catch(error){
             console.log(error)
-            alert(error)
-
+            setLoadingAuth(false)
             if (error.code === 'auth/invalid-email') return "E-mail inválido";
             return "Erro ao realizar cadastro. Tente novamente.";
         }
     }
 
     async function login(email, senha) {
+        setLoadingAuth(true)
         try{
 
             const userCredential = await signInWithEmailAndPassword(auth, email, senha);
@@ -58,10 +60,11 @@ function AuthProvider({children}){
 
             setUser(user);
             await AsyncStorage.setItem("@user", JSON.stringify(user));
+            setLoadingAuth(false)
             return null
         }catch(error){
             console.log(error)
-            
+            setLoadingAuth(false)
             if (error.code === 'auth/wrong-password') return "Senha incorreta.";
             if (error.code === 'auth/missing-password') return "A senha não pode ficar vazia.";
             if (error.code === 'auth/invalid-email') return "E-mail inválido";

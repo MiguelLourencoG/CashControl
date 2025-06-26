@@ -1,5 +1,5 @@
 import React, {useState, useContext} from "react";
-import { SafeAreaView, Text, StyleSheet, TextInput, View, TouchableOpacity } from "react-native";
+import { SafeAreaView, Text, StyleSheet, TextInput, View, Modal, ActivityIndicator } from "react-native";
 
 import { AuthContext } from "../contexts/auth";
 
@@ -10,7 +10,7 @@ import Button from "../components/Button";
 
 export default function Login({ navigation  }) {
 
-    const {login} = useContext(AuthContext)
+    const {login, loadingAuth} = useContext(AuthContext)
 
     const [email, setEmail] = useState("")
     const [senha, setSenha] = useState("")
@@ -87,6 +87,20 @@ export default function Login({ navigation  }) {
                     </Text>
                 </View>
 
+                <Modal
+                    transparent={true}
+                    animationType="fade"
+                    visible={loadingAuth}
+                    onRequestClose={() => {}}
+                >
+                    <View style={Styles.ModalBackground}>
+                    <View style={Styles.ActivityIndicatorWrapper}>
+                        <ActivityIndicator size="50" color="#00695C" />
+                        <Text style={{ marginTop: 10, fontSize: 20 }}>Entrando...</Text>
+                    </View>
+                    </View>
+                </Modal>
+
                 <Button text="Entrar" onPress={handleLogin}/>
 
                 <View style={{ alignItems: 'center'}}>
@@ -162,5 +176,24 @@ const Styles = StyleSheet.create({
         fontSize: 22,
         marginTop: 4,
         marginLeft: 4,
-    }
+    },
+    ModalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    ActivityIndicatorWrapper: {
+        backgroundColor: 'white',
+        height: 150,
+        width: 170,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
 })

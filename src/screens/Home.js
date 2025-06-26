@@ -173,7 +173,7 @@ export default function Home({ navigation }) {
                             </Text>
 
                             <Text style={{marginHorizontal: 'auto',
-                                fontSize: 30,
+                                fontSize: 27,
                                 color: '#FFF',
                                 fontWeight: 'bold'
                             }}>

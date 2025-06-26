@@ -1,5 +1,5 @@
 import React, {useState, useContext} from "react";
-import { SafeAreaView, View, Text, StyleSheet, TextInput } from "react-native";
+import { SafeAreaView, View, Text, StyleSheet, Modal, ActivityIndicator, TextInput } from "react-native";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import Button from "../components/Button";
 
@@ -9,7 +9,7 @@ import { AuthContext } from "../contexts/auth";
 
 export default function SignUp({ navigation }) {
 
-    const {signUp} = useContext(AuthContext)
+    const {signUp, loadingAuth} = useContext(AuthContext)
 
     const [nome, setNome] = useState("")
     const [email, setEmail] = useState("")
@@ -87,6 +87,20 @@ export default function SignUp({ navigation }) {
                     style={Styles.TextInput}
                 />
 
+                <Modal
+                    transparent={true}
+                    animationType="fade"
+                    visible={loadingAuth}
+                    onRequestClose={() => {}}
+                >
+                    <View style={Styles.modalBackground}>
+                    <View style={Styles.activityIndicatorWrapper}>
+                        <ActivityIndicator size="50" color="#00695C" />
+                        <Text style={{ marginTop: 10, fontSize: 20 }}>Entrando...</Text>
+                    </View>
+                    </View>
+                </Modal>
+
                 <Button text="Cadastrar" onPress={handleSignUp}/>
 
                 <View style={{ alignItems: 'center'}}>
@@ -163,5 +177,24 @@ const Styles = StyleSheet.create({
         fontSize: 22,
         marginTop: 4,
         marginLeft: 4,
-    }
+    },
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    activityIndicatorWrapper: {
+        backgroundColor: 'white',
+        height: 150,
+        width: 170,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
 })
