@@ -13,6 +13,8 @@ export default function EditarCartao({navigation}){
     const [limite, setLimite] = useState(0);
     const [fatura, setFatura] = useState(0)
 
+    const [errors, setErrors] = useState({})
+
     useEffect(() => {
         async function carregarCartao() {
             try {
@@ -34,7 +36,29 @@ export default function EditarCartao({navigation}){
         carregarCartao();
     }, []);
 
+    function validarCampos() {
+        let e = {}
+
+        if (!nome) e.nome = "Nome não pode ficar vazio"
+        if (!limite) e.limite = "Limite não pode ficar vazio"
+        if (!fatura) e.fatura = "Fatura não pode ficar vazia"
+        
+        if (limite && limite.includes(',')) e.limite = "Use ponto (.) no lugar da vírgula (,)"
+        if (limite && limite.split('.').length > 2) e.limite = "Use apenas um único ponto (.) como separador decimal"
+        
+        if (fatura && fatura.includes(',')) e.fatura = "Use ponto (.) no lugar da vírgula (,)"
+        if (fatura && fatura.split('.').length > 2) e.fatura = "Use apenas um único ponto (.) como separador decimal"
+
+        setErrors(e)
+        return Object.keys(e).length === 0;
+       
+    }
+
     async function salvarAlteracoes() {
+        if (!validarCampos()) {
+            return;
+        }
+
         try {
             await updateDoc(doc(db, "cartoes", id), {
                 nome,
@@ -68,6 +92,8 @@ export default function EditarCartao({navigation}){
                     />
                 </View>
 
+                {errors.nome ? <Text style={styles.Erro}>{errors.nome}</Text> : null}
+
                 <Text style={styles.Label}>Limite:</Text>
                 <View style={styles.TextInputContainer}>
                     
@@ -82,6 +108,8 @@ export default function EditarCartao({navigation}){
                     />
                 </View>
                 
+                {errors.limite ? <Text style={styles.Erro}>{errors.limite}</Text> : null}
+
                 <Text style={styles.Label}>Fatura:</Text>
                 <View style={styles.TextInputContainer}>
                     
@@ -95,7 +123,9 @@ export default function EditarCartao({navigation}){
                         onChangeText={setFatura}
                     />
                 </View>
-                    
+
+                {errors.fatura ? <Text style={styles.Erro}>{errors.fatura}</Text> : null}
+
                 <Button text="Salvar" onPress={salvarAlteracoes}/>
 
             </View> 
@@ -152,5 +182,12 @@ const styles = StyleSheet.create({
     TextInput:{
         flex: 1,
         fontSize: 23
+    },
+
+    Erro: {
+        color: 'red',
+        fontSize: 22,
+        marginTop: 4,
+        marginLeft: 4,
     }
 })

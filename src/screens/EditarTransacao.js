@@ -16,7 +16,11 @@ export default function EditarTransacao({navigation}){
 
     const [show, setShow] = useState(false);
 
+    const [errors, setErrors] = useState({})
+
     useEffect(() => {
+        
+
         async function getTranscao() {
             try {
                 const transacaoSnap = await getDoc(doc(db, "transacoes", id));
@@ -55,7 +59,27 @@ export default function EditarTransacao({navigation}){
         return new Date(ano, mes - 1, dia);
     }
 
+
+    function validarCampos() {
+        let e = {}
+
+        if (!nome) e.nome = "Nome não pode ficar vazio"
+        if (!valor) e.valor = "Saldo não pode ficar vazio"
+        
+        if (valor && valor.includes(',')) e.valor = "Use ponto (.) no lugar da vírgula (,)"
+        if (valor && valor.split('.').length > 2) e.valor = "Use apenas um único ponto (.) como separador decimal"
+
+        setErrors(e)
+        return Object.keys(e).length === 0;
+    
+    }
+
+
     async function salvarAlteracoes() {
+        if (!validarCampos()) {
+            return;
+        }
+
         try {
             await updateDoc(doc(db, "transacoes", id), {
                 nome,
@@ -88,6 +112,8 @@ export default function EditarTransacao({navigation}){
                     />
                 </View>
 
+                {errors.nome ? <Text style={styles.Erro}>{errors.nome}</Text> : null}
+
                 <Text style={styles.Label}>Valor:</Text>
                 <View style={styles.TextInputContainer}>
                     {
@@ -102,6 +128,8 @@ export default function EditarTransacao({navigation}){
                     />
                 </View>
                 
+                {errors.valor ? <Text style={styles.Erro}>{errors.valor}</Text> : null}
+
                 <Text style={styles.Label}>Data:</Text>
                 <TouchableOpacity onPress={showDatePicker}>
                     <View style={styles.TextInputContainer} >
@@ -177,5 +205,12 @@ const styles = StyleSheet.create({
     TextInput:{
         flex: 1,
         fontSize: 23,
+    },
+
+    Erro: {
+        color: 'red',
+        fontSize: 22,
+        marginTop: 4,
+        marginLeft: 4,
     }
 })

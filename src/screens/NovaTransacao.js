@@ -15,6 +15,8 @@ export default function NovaTransacao({ navigation }) {
     const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
 
+    const [errors, setErrors] = useState({})
+
     const onChange = (event, selectedDate) => {
         setShow(Platform.OS === 'ios');
         if (selectedDate) {
@@ -26,17 +28,31 @@ export default function NovaTransacao({ navigation }) {
         setShow(true);
     };
 
-        const [nome, setNome] = useState()
-        const [valor, setValor] = useState()
+        const [nome, setNome] = useState('')
+        const [valor, setValor] = useState(null)
         const [data, setData] = useState(date.toLocaleDateString())
-        const userUid = user.uid
+        
     
+
+        function validarCampos() {
+            let e = {}
+
+            if (!nome) e.nome = "Nome não pode ficar vazio"
+            if (!valor) e.valor = "Saldo não pode ficar vazio"
+            
+            if (valor && valor.includes(',')) e.valor = "Use ponto (.) no lugar da vírgula (,)"
+            if (valor && valor.split('.').length > 2) e.valor = "Use apenas um único ponto (.) como separador decimal"
+
+            setErrors(e)
+            return Object.keys(e).length === 0;
+        
+        }
+
         async function addTransacao() {
     
-            console.log(nome)
-            console.log(valor)
-            console.log(data)
-            console.log(userUid)
+            if (!validarCampos()) {
+                return;
+            }
     
             try {
                 const docRef = await addDoc(collection(db, "transacoes"), {
@@ -68,6 +84,8 @@ export default function NovaTransacao({ navigation }) {
                     onChangeText={setNome}
                 />
 
+                {errors.nome ? <Text style={styles.Erro}>{errors.nome}</Text> : null}
+
                 <Text style={styles.Label}>Valor da transação:</Text>
                 <TextInput 
                     style={styles.TextInput} 
@@ -76,6 +94,8 @@ export default function NovaTransacao({ navigation }) {
                     value={valor}
                     onChangeText={setValor}
                 />
+
+                {errors.valor ? <Text style={styles.Erro}>{errors.valor}</Text> : null}
 
                 <Text style={styles.Label}>Data da transação:</Text>
                 <TouchableOpacity onPress={showDatePicker}>
@@ -152,5 +172,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         fontSize: 23,
         color: '#212121',
+    },
+
+    Erro: {
+        color: 'red',
+        fontSize: 22,
+        marginTop: 4,
+        marginLeft: 4,
     }
 })

@@ -12,6 +12,8 @@ export default function EditarConta({navigation}){
     const [nome, setNome] = useState('Carregando...')
     const [saldo, setSaldo] = useState(0);
 
+    const [errors, setErrors] = useState({})
+
     useEffect(() => {
         async function carregarConta() {
             try {
@@ -32,7 +34,26 @@ export default function EditarConta({navigation}){
         carregarConta();
     }, []);
 
+    function validarCampos() {
+        let e = {}
+
+        if (!nome) e.nome = "Nome não pode ficar vazio"
+        if (!saldo) e.saldo = "Saldo não pode ficar vazio"
+        
+        if (saldo && saldo.includes(',')) e.saldo = "Use ponto (.) no lugar da vírgula (,)"
+        if (saldo && saldo.split('.').length > 2) e.saldo = "Saldo inválido: use apenas um ponto (.) como separador decimal"
+
+        setErrors(e)
+        return Object.keys(e).length === 0;
+       
+    }
+
     async function salvarAlteracoes() {
+
+        if (!validarCampos()) {
+            return;
+        }
+
         try {
             await updateDoc(doc(db, "contas", id), {
                 nome,
@@ -64,8 +85,9 @@ export default function EditarConta({navigation}){
                     />
                 </View>
 
-                <Text style={styles.Label}>Saldo:</Text>
+                {errors.nome ? <Text style={styles.Erro}>{errors.nome}</Text> : null}
 
+                <Text style={styles.Label}>Saldo:</Text>
                 <View style={styles.TextInputContainer}>
                     {
                         <Text style={{fontSize: 23}}>R$</Text>
@@ -79,7 +101,7 @@ export default function EditarConta({navigation}){
                     />
                 </View>
                 
-                
+                {errors.saldo ? <Text style={styles.Erro}>{errors.saldo}</Text> : null}
                     
                 <Button text="Salvar" onPress={salvarAlteracoes}/>
 
@@ -138,5 +160,12 @@ const styles = StyleSheet.create({
     TextInput:{
         flex: 1,
         fontSize: 23
+    },
+
+    Erro: {
+        color: 'red',
+        fontSize: 22,
+        marginTop: 4,
+        marginLeft: 4,
     }
 })

@@ -11,15 +11,31 @@ export default function NovaConta({ navigation }) {
 
     const {user} = useContext(AuthContext);
 
-    const [nome, setNome] = useState()
-    const [saldo, setSaldo] = useState()
-    const userUid = user.uid
+    const [nome, setNome] = useState('')
+    const [saldo, setSaldo] = useState(null)
+
+    const [errors, setErrors] = useState({})
+    
+
+    function validarCampos() {
+        let e = {}
+
+        if (!nome) e.nome = "Nome não pode ficar vazio"
+        if (!saldo) e.saldo = "Saldo não pode ficar vazio"
+        
+        if (saldo && saldo.includes(',')) e.saldo = "Use ponto (.) no lugar da vírgula (,)"
+        if (saldo && saldo.split('.').length > 2) e.saldo = "Saldo inválido: use apenas um ponto (.) como separador decimal"
+
+        setErrors(e)
+        return Object.keys(e).length === 0;
+       
+    }
 
     async function addConta() {
 
-        console.log(nome)
-        console.log(saldo)
-        console.log(userUid)
+        if (!validarCampos()) {
+            return;
+        }
 
         try {
             const docRef = await addDoc(collection(db, "contas"), {
@@ -40,27 +56,31 @@ export default function NovaConta({ navigation }) {
                 <Text style={Styles.Title}>Nova conta bancária</Text>
             </View>
             <View style={Styles.Container}>
-                <Text style={Styles.Text}>Nome da conta:</Text>
-                <TextInput
-                    style={Styles.TextInput} 
-                    placeholder="Digite o nome da conta..."
-                    autoCapitalize="sentences"
-                    autoCorrect={false}
+                <Text style={Styles.Text}>Nome:</Text>
+                <View style={Styles.TextInputContainer}>
+                <TextInput 
+                    style={Styles.TextInput}
+                    placeholder="ex. Conta do Nubank"
                     value={nome}
                     onChangeText={setNome}
-                    
                 />
+                </View>
+
+                {errors.nome ? <Text style={Styles.Erro}>{errors.nome}</Text> : null}
 
                 <Text style={Styles.Text}>Saldo da conta:</Text>
                 <TextInput 
                     style={Styles.TextInput} 
-                    placeholder="Digite o saldo da conta..."
+                    placeholder="Ex. 200.00"
                     keyboardType="numeric"
                     value={saldo}
                     onChangeText={setSaldo}
                 />
 
+                {errors.saldo ? <Text style={Styles.Erro}>{errors.saldo}</Text> : null}
+
                 <Button text="Salvar" onPress={() => addConta(nome, saldo, user.uid)}/>
+
             </View>
         </SafeAreaView>
     );
@@ -113,5 +133,13 @@ const Styles = StyleSheet.create({
         borderWidth: 1,
         fontSize: 23,
         color: '#212121',
+    },
+    
+    Erro: {
+        color: 'red',
+        fontSize: 22,
+        marginTop: 4,
+        marginLeft: 4,
     }
+
 })

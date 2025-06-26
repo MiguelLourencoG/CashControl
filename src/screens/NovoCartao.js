@@ -11,17 +11,36 @@ export default function NovoCartao({ navigation }) {
 
     const {user} = useContext(AuthContext);
 
-    const [nome, setNome] = useState()
-    const [limite, setLimite] = useState()
-    const [fatura, setFatura] = useState()
-    const userUid = user.uid
+    const [nome, setNome] = useState("")
+    const [limite, setLimite] = useState(null)
+    const [fatura, setFatura] = useState(null)
+
+    const [errors, setErrors] = useState({})
+
+    function validarCampos() {
+        let e = {}
+
+        if (!nome) e.nome = "Nome é não pode ficar vazio"
+        if (!limite) e.limite = "Limite não pode ficar vazio"
+        if (!fatura) e.fatura = "Fatura não pode ficar vazio"
+        
+        if (limite && limite.includes(',')) e.limite = "Use ponto (.) no lugar da vírgula (,)"
+        if (limite && limite.split('.').length > 2) e.limite = "Use apenas um único ponto (.) como separador decimal"
+
+        if (fatura && fatura.includes(',')) e.fatura = "Use ponto (.) no lugar da vírgula (,)"
+        if (fatura && fatura.split('.').length > 2) e.fatura = "Use apenas um único ponto (.) como separador decimal"
+
+        setErrors(e)
+
+        return Object.keys(e).length === 0;
+       
+    }
 
     async function addCartao() {
 
-        console.log(nome)
-        console.log(limite)
-        console.log(fatura)
-        console.log(userUid)
+        if (!validarCampos()) {
+            return;
+        }
 
         try {
             const docRef = await addDoc(collection(db, "cartoes"), {
@@ -53,6 +72,8 @@ export default function NovoCartao({ navigation }) {
                     onChangeText={setNome}                    
                 />
 
+                {errors.nome ? <Text style={Styles.Erro}>{errors.nome}</Text> : null}
+
                 <Text style={Styles.Text}>Limite do cartão:</Text>
                 <TextInput 
                     style={Styles.TextInput} 
@@ -62,6 +83,8 @@ export default function NovoCartao({ navigation }) {
                     onChangeText={setLimite}
                 />
 
+                {errors.limite ? <Text style={Styles.Erro}>{errors.limite}</Text> : null}
+
                 <Text style={Styles.Text}>Fatura atual do cartão:</Text>
                 <TextInput 
                     style={Styles.TextInput} 
@@ -70,6 +93,8 @@ export default function NovoCartao({ navigation }) {
                     value={fatura}
                     onChangeText={setFatura}
                 />
+
+                {errors.fatura ? <Text style={Styles.Erro}>{errors.fatura}</Text> : null}
 
                 <Button text="Salvar" onPress={() => addCartao(nome, limite, fatura, user.uid)}/>
             </View>
@@ -124,5 +149,12 @@ const Styles = StyleSheet.create({
         borderWidth: 1,
         fontSize: 23,
         color: '#212121',
+    },
+
+    Erro: {
+        color: 'red',
+        fontSize: 22,
+        marginTop: 4,
+        marginLeft: 4,
     }
 })
