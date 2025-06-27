@@ -5,7 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../firebaseConnection';
 
-export default function TransacaoCard({ id, nome, valor, data }) {
+export default function TransacaoCard({ id, nome, valor, data, tipo, origem }) {
     const navigation = useNavigation();
 
     async function handleDelete(){
@@ -45,9 +45,15 @@ export default function TransacaoCard({ id, nome, valor, data }) {
                         </Text>
                     </View>
 
+                    
+                    <View style={{alignItems: 'center'}}>
+                        <Text style={{fontSize: 20, color: tipo === 'Receita' ? 'green' : 'red' }}>{tipo}</Text>
+                        <Text style={{fontSize: 15}}>{origem}</Text>
+                    </View>
+
                     <View>
                         <Text 
-                            style={{fontSize: 20, color: valor < 0 ? 'red' : 'green' }}
+                            style={{fontSize: 17, color: tipo === 'Receita' ? 'green' : 'red' }}
                             numberOfLines={1}
                             ellipsizeMode="tail"                        
                         >

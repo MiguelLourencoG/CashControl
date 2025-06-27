@@ -12,7 +12,8 @@ export default function EditarPendencia({navigation}){
 
     const [nome, setNome] = useState('Carregando...')
     const [valor, setValor] = useState(0);
-    const [date, setDate] = useState('');
+    const [date, setDate] = useState(new Date());
+    const [data, setData] = useState(new Date().toLocaleDateString());
 
     const [show, setShow] = useState(false);
 
@@ -26,12 +27,14 @@ export default function EditarPendencia({navigation}){
                 const pendenciaSnap = await getDoc(doc(db, "pendencias", id));
                 
                 if (pendenciaSnap) {
-                    const data = pendenciaSnap.data();
-                    setNome(data.nome);
-                    setValor(String(data.valor.toFixed(2)))
-                    setDate(data.data)
+                    const pendencia = pendenciaSnap.data();
+                    setNome(pendencia.nome);
+                    setValor(String(pendencia.valor.toFixed(2)))
+                    const dataConvertida = formatDateString(pendencia.data);
+                    setDate(dataConvertida);
+                    setData(pendencia.data);
 
-                    console.log(data.data)
+                    console.log(pendencia.data)
                 } else {
                     console.log("Pendência não encontrada");
                 }
@@ -46,8 +49,8 @@ export default function EditarPendencia({navigation}){
     const onChange = (event, selectedDate) => {
         setShow(Platform.OS === 'ios');
         if (selectedDate) {
-
-            setDate(selectedDate.toLocaleDateString());
+            setDate(selectedDate);
+            setData(selectedDate.toLocaleDateString());
         }
     };
 
@@ -74,7 +77,6 @@ export default function EditarPendencia({navigation}){
     
     }
 
-
     async function salvarAlteracoes() {
         if (!validarCampos()) {
             return;
@@ -84,7 +86,7 @@ export default function EditarPendencia({navigation}){
             await updateDoc(doc(db, "pendencias", id), {
                 nome,
                 valor: parseFloat(valor),
-                date
+                data
             });
             navigation.goBack();
             console.log("Pendência atualizada!");
@@ -133,20 +135,18 @@ export default function EditarPendencia({navigation}){
 
                 <Text style={styles.Label}>Data:</Text>
                 <TouchableOpacity onPress={showDatePicker}>
-                    <View style={styles.TextInputContainer} >
-                    <Text style={styles.TextInput}>
-                        {date}
-                    </Text>
+                    <View style={styles.TextInputContainer}>
+                        <Text style={styles.TextInput}>{data}</Text>
 
-                    {show && (
+                        {show && (
                         <DateTimePicker
-                        value={formatDateString(date)}
-                        mode="date"
-                        display="default"
-                        onChange={onChange}
+                            value={date}
+                            mode="date"
+                            display="default"
+                            onChange={onChange}
                         />
-                    )}
-                </View>
+                        )}
+                    </View>
                 </TouchableOpacity>
                     
                 <Button text="Salvar" onPress={salvarAlteracoes}/>

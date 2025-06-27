@@ -47,7 +47,7 @@ export default function Transacoes({navigation}){
             <View style={styles.Container}>
                 
                 {transacoes.map((item) => (
-                    <TransacaoCard key={item.id} id={item.id} nome={item.nome} valor={item.valor} data={item.data}/>      
+                    <TransacaoCard key={item.id} id={item.id} nome={item.nome} valor={item.valor} data={item.data} tipo={item.tipo} origem={item.origem}/>      
                 ))}
 
             </View>

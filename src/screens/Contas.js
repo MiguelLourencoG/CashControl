@@ -7,6 +7,8 @@ import { doc, getDoc, getDocs, setDoc, collection, query, where, onSnapshot, del
 import { AuthContext } from "../contexts/auth";
 import { Feather } from '@expo/vector-icons';
 
+import AddButtom from "../components/AddButton";
+
 export default function Contas({navigation}){
 
     const {user} = useContext(AuthContext)
@@ -84,7 +86,7 @@ export default function Contas({navigation}){
             </View>
 
             
-
+            <AddButtom onPress={() => navigation.navigate('NovaConta')}/>
         </SafeAreaView>
     )
 }

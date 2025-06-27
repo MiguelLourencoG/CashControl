@@ -23,19 +23,22 @@ function AppRoutes(){
   return (
       <Stack.Navigator>
         <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
-        <Stack.Screen name="Profile" component={Profile}/>
-        <Stack.Screen name="NovaConta" component={NovaConta}/>
-        <Stack.Screen name="NovoCartao" component={NovoCartao}/>
-        <Stack.Screen name="NovaTransacao" component={NovaTransacao}/>
-        <Stack.Screen name="NovaPendencia" component={NovaPendencia}/>        
-        <Stack.Screen name="Cartoes" component={Cartoes}/>
-        <Stack.Screen name="Contas" component={Contas}/>
-        <Stack.Screen name="Transacoes" component={Transacoes}/>
-        <Stack.Screen name="Pendencias" component={Pendencias}/>
-        <Stack.Screen name="EditarConta" component={EditarConta}/>
-        <Stack.Screen name="EditarCartao" component={EditarCartao}/>
-        <Stack.Screen name="EditarTransacao" component={EditarTransacao}/>
-        <Stack.Screen name="EditarPendencia" component={EditarPendencia}/>
+        <Stack.Screen name="Profile" component={Profile} options={{ title: 'Perfil' }}/>
+
+        <Stack.Screen name="NovaConta" component={NovaConta} options={{ title: 'Nova conta' }}/>
+        <Stack.Screen name="NovoCartao" component={NovoCartao} options={{ title: 'Novo cartão' }}/>
+        <Stack.Screen name="NovaTransacao" component={NovaTransacao} options={{ title: 'Nova transação' }}/>
+        <Stack.Screen name="NovaPendencia" component={NovaPendencia} options={{ title: 'Nova pendência' }}/>
+
+        <Stack.Screen name="Cartoes" component={Cartoes} options={{ title: 'Ver Cartões' }}/>
+        <Stack.Screen name="Contas" component={Contas} options={{ title: 'Ver contas' }}/>
+        <Stack.Screen name="Transacoes" component={Transacoes} options={{ title: 'Ver Transações' }}/>
+        <Stack.Screen name="Pendencias" component={Pendencias} options={{ title: 'Ver Pendências' }}/>
+
+        <Stack.Screen name="EditarConta" component={EditarConta} options={{ title: 'Editar conta' }}/>
+        <Stack.Screen name="EditarCartao" component={EditarCartao} options={{ title: 'Editar cartão' }}/>
+        <Stack.Screen name="EditarTransacao" component={EditarTransacao} options={{ title: 'Editar transação' }}/>
+        <Stack.Screen name="EditarPendencia" component={EditarPendencia} options={{ title: 'Editar pendência' }}/>
       </Stack.Navigator>
   );
 }

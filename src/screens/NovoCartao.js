@@ -65,7 +65,7 @@ export default function NovoCartao({ navigation }) {
                 <Text style={Styles.Text}>Nome do cartão:</Text>
                 <TextInput
                     style={Styles.TextInput} 
-                    placeholder="Digite o nome do cartão..."
+                    placeholder="Ex. Caixa"
                     autoCapitalize="sentences"
                     autoCorrect={false}
                     value={nome}
@@ -77,7 +77,7 @@ export default function NovoCartao({ navigation }) {
                 <Text style={Styles.Text}>Limite do cartão:</Text>
                 <TextInput 
                     style={Styles.TextInput} 
-                    placeholder="Digite o limite do cartão..."
+                    placeholder="Ex. 1500.00"
                     keyboardType="numeric"                    
                     value={limite}
                     onChangeText={setLimite}
@@ -88,7 +88,7 @@ export default function NovoCartao({ navigation }) {
                 <Text style={Styles.Text}>Fatura atual do cartão:</Text>
                 <TextInput 
                     style={Styles.TextInput} 
-                    placeholder="Digite o fatura do cartão..."
+                    placeholder="Ex. 300"
                     keyboardType="numeric"
                     value={fatura}
                     onChangeText={setFatura}

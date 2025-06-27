@@ -7,6 +7,8 @@ import { doc, getDoc, getDocs, setDoc, collection, query, where, onSnapshot, del
 import { AuthContext } from "../contexts/auth";
 import { Feather } from '@expo/vector-icons';
 
+import AddButtom from "../components/AddButton";
+
 export default function Cartoes({navigation}){
 
     const {user} = useContext(AuthContext)
@@ -90,7 +92,7 @@ export default function Cartoes({navigation}){
                 
             </View>
 
-            
+            <AddButtom onPress={() => navigation.navigate('NovoCartao')}/>
 
         </SafeAreaView>
     )

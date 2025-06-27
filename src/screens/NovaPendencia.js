@@ -21,6 +21,7 @@ export default function NovaPendencia({ navigation }) {
         setShow(Platform.OS === 'ios');
         if (selectedDate) {
             setDate(selectedDate);
+            setData(selectedDate.toLocaleDateString());
         }
     };
 
@@ -31,6 +32,7 @@ export default function NovaPendencia({ navigation }) {
     const [nome, setNome] = useState()
     const [valor, setValor] = useState()
     const [data, setData] = useState(date.toLocaleDateString())
+    
 
     function validarCampos() {
         let e = {}
@@ -97,24 +99,18 @@ export default function NovaPendencia({ navigation }) {
 
                 <Text style={styles.Label}>Data limite do pagamento:</Text>
                 <TouchableOpacity onPress={showDatePicker}>
-                    <View style={styles.TextInputContainer} >
-                    <Text 
-                        style={styles.TextInput}
-                        value={data}
-                        onChangeText={setData}
-                    >
-                        {date.toLocaleDateString()}
-                    </Text>
+                    <View style={styles.TextInputContainer}>
+                        <Text style={styles.TextInput}>{data}</Text>
 
-                    {show && (
+                        {show && (
                         <DateTimePicker
-                        value={date}
-                        mode="date"
-                        display="default"
-                        onChange={onChange}
+                            value={date}
+                            mode="date"
+                            display="default"
+                            onChange={onChange}
                         />
-                    )}
-                </View>
+                        )}
+                    </View>
                 </TouchableOpacity>
 
                 <Button text="Salvar" onPress={() => addPendencia(nome, valor, data, user.uid)}/>

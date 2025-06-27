@@ -8,7 +8,7 @@ export default function Start({ navigation }) {
         <SafeAreaView style={Styles.View}>
             <View style={Styles.LogoContainer}>
                 <Image 
-                    source={require('../../assets/RANK100.png')}
+                    source={require('../../assets/Cash Control Logo.png')}
                     style={{width: '100%'}}
                     resizeMode="contain"
                 />

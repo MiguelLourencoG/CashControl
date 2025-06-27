@@ -281,13 +281,18 @@ export default function Home({ navigation }) {
                                 style={styles.Item}
                                 onPress={() => navigation.navigate('EditarTransacao', {id: item.id})}
                             >
-                                <View>
+                                <View style={{alignItems: 'center'}}>
                                     <Text style={{fontSize: 20,}}>{item.nome}</Text>
                                     <Text>{item.data}</Text>
                                 </View>
                     
+                                <View style={{alignItems: 'center'}}>
+                                    <Text style={{fontSize: 20, color: item.tipo === 'Receita' ? 'green' : 'red' }}>{item.tipo}</Text>
+                                    <Text style={{fontSize: 20}}>{item.origem}</Text>
+                                </View>
+
                                 <View>
-                                    <Text style={{fontSize: 20, color: item.valor < 0 ? 'red' : 'green' }}>
+                                    <Text style={{fontSize: 20, color: item.tipo === 'Receita' ? 'green' : 'red' }}>
                                         R$ {item.valor.toFixed(2)}
                                     </Text>                       
                                     
